@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/shophub
+    username: root
+    password: asdf1234
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql: trace
+
+server:
+  tomcat:
+    basedir: tomcat
+
+management:
+  endpoints:
+    enabled-by-default: false
+
+environment: local

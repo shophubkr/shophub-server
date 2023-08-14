@@ -8,6 +8,12 @@ plugins {
 	kotlin("plugin.jpa") version "1.8.22"
 }
 
+configurations {
+	compileOnly {
+		extendsFrom(configurations.annotationProcessor.get())
+	}
+}
+
 group = "kr.co.shophub"
 version = "0.0.1-SNAPSHOT"
 
@@ -37,6 +43,10 @@ tasks.withType<KotlinCompile> {
 		freeCompilerArgs += "-Xjsr305=strict"
 		jvmTarget = "17"
 	}
+}
+
+tasks.named<Jar>("jar") {
+	enabled = false
 }
 
 tasks.withType<Test> {

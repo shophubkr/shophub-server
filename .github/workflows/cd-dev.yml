@@ -1,0 +1,84 @@
+name: DEV) Push Docker Image And Deploy to EC2
+
+on:
+  push:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Set up yml secrets file
+        env:
+          YAML_SECRET: ${{ secrets.YAML_EC2_DEV }}
+          YAML_DIR: src/main/resources
+          YAML_FILE_NAME: application-ec2-dev.yml
+        run: |
+          echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
+          echo "YAML_SECRET has been decoded and saved to $YAML_DIR/$YAML_FILE_NAME"
+
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Get Short SHA
+        id: short_sha
+        run: |
+          echo "::set-output name=sha_short::$(echo ${{ github.sha }} | head -c 7)"
+          echo "Short SHA: ${{ steps.short_sha.outputs.sha_short }}"
+
+      - name: Print branch & tag information
+        run: |
+          echo "Current branch: ${{ github.event.inputs.branch }}"
+          echo "Current tag: ${{ steps.short_sha.outputs.sha_short }}"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew bootJar
+
+      - name: Docker Login and Push
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          DOCKER_IMAGE_TAG: lyfe-server:${{ steps.short_sha.outputs.sha_short }}
+        run: |
+          echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+          docker build -t $DOCKER_IMAGE_TAG .
+          docker tag $DOCKER_IMAGE_TAG $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_TAG
+          docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_TAG
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }}
+            docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }} lyfe-server
+            docker rm -f $(docker ps -qa)
+            docker run -d --name lyfe-server -e TZ=Asia/Seoul -e SPRING_PROFILES_ACTIVE=ec2-dev -p 8080:8081 ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }}
