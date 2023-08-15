@@ -14,4 +14,8 @@ class User(
     val providerId: String,
     val profile: String,
     val isDeleted: Boolean,
+
+    @Enumerated(EnumType.STRING)
+    val userRole: UserRole,
+
 )
