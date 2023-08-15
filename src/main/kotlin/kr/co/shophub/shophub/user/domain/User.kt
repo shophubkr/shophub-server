@@ -13,10 +13,10 @@ class User(
     val nickname: String,
     val providerId: String,
     val profile: String,
-    val isDeleted: Boolean,
+    var isDeleted: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    val userRole: UserRole,
+    val userRole: UserRole = UserRole.GUEST,
 
     @Enumerated(EnumType.STRING)
     val providerType: ProviderType = ProviderType.NO_SOCIAL,
