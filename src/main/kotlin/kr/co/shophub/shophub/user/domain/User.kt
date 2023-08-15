@@ -18,4 +18,7 @@ class User(
     @Enumerated(EnumType.STRING)
     val userRole: UserRole,
 
+    @Enumerated(EnumType.STRING)
+    val providerType: ProviderType,
+
 )
