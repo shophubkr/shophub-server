@@ -11,8 +11,8 @@ class User(
     val email: String,
     val password: String,
     val nickname: String,
-    val providerId: String,
-    val profile: String,
+    val providerId: String = "only-social",
+    val profile: String = "only-social",
     var isDeleted: Boolean = false,
 
     @Enumerated(EnumType.STRING)
