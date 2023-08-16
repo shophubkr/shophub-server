@@ -18,7 +18,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Setup MySQL
+      - name : Setup MySQL
         uses: samin/mysql-action@v1
         with:
           host port: 3800
