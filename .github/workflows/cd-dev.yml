@@ -63,7 +63,7 @@ jobs:
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          DOCKER_IMAGE_TAG: lyfe-server:${{ steps.short_sha.outputs.sha_short }}
+          DOCKER_IMAGE_TAG: shophub-server:${{ steps.short_sha.outputs.sha_short }}
         run: |
           echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
           docker build -t $DOCKER_IMAGE_TAG .
@@ -78,7 +78,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }}
-            docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }} lyfe-server
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/shophub-server:${{ steps.short_sha.outputs.sha_short }}
+            docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/shophub-server:${{ steps.short_sha.outputs.sha_short }} shophub-server
             docker rm -f $(docker ps -qa)
-            docker run -d --name lyfe-server -e TZ=Asia/Seoul -e SPRING_PROFILES_ACTIVE=ec2-dev -p 8080:8081 ${{ secrets.DOCKER_HUB_USERNAME }}/lyfe-server:${{ steps.short_sha.outputs.sha_short }}
+            docker run -d --name shophub-server -e TZ=Asia/Seoul -e SPRING_PROFILES_ACTIVE=ec2-dev -p 8080:8081 ${{ secrets.DOCKER_HUB_USERNAME }}/shophub-server:${{ steps.short_sha.outputs.sha_short }}
