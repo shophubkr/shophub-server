@@ -12,6 +12,7 @@ class User(
     val email: String,
     var password: String,
     val nickname: String,
+    var refreshToken: String = "empty",
     val providerId: String = "only-social",
     val profile: String = "only-social",
     var isDeleted: Boolean = false,
@@ -25,5 +26,9 @@ class User(
 ) {
     fun encodePassword(encoder: PasswordEncoder) {
         this.password = encoder.encode(password)
+    }
+
+    fun updateRefreshToken(updateRefreshToken: String) {
+        this.refreshToken = updateRefreshToken
     }
 }
