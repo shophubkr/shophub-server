@@ -1,10 +1,13 @@
 package kr.co.shophub.shophub.global.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import kr.co.shophub.shophub.global.jwt.filter.JwtAuthenticationProcessingFilter
+import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter
 import kr.co.shophub.shophub.global.login.handler.LoginFailureHandler
 import kr.co.shophub.shophub.global.login.handler.LoginSuccessHandler
 import kr.co.shophub.shophub.global.login.service.LoginService
+import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -27,6 +30,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 class SecurityConfig(
     private val objectMapper: ObjectMapper,
     private val loginService: LoginService,
+    private val userRepository: UserRepository,
+    private val jwtService: JwtService,
 ) {
 
     @Bean
@@ -41,6 +46,7 @@ class SecurityConfig(
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter::class.java)
+            .addFilterAfter(jwtAuthenticationProcessingFilter(), CustomJsonUsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
 
@@ -51,7 +57,7 @@ class SecurityConfig(
 
     @Bean
     fun loginSuccessHandler(): LoginSuccessHandler? {
-        return LoginSuccessHandler()
+        return LoginSuccessHandler(jwtService, userRepository)
     }
 
     @Bean
@@ -74,6 +80,11 @@ class SecurityConfig(
         customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler())
         customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler())
         return customJsonUsernamePasswordLoginFilter
+    }
+
+    @Bean
+    fun jwtAuthenticationProcessingFilter(): JwtAuthenticationProcessingFilter? {
+        return JwtAuthenticationProcessingFilter(jwtService, userRepository)
     }
 
 }
