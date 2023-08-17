@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.user.service
 import kr.co.shophub.shophub.user.controller.dto.SignUpRequest
 import kr.co.shophub.shophub.user.domain.User
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -10,16 +11,21 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
 ) {
 
     @Transactional
     fun signUp(request: SignUpRequest): User {
         checkDuplicate(request)
-        return User(
+        val user = User(
             email = request.email,
             password = request.password,
             nickname = request.nickname,
         )
+
+        user.encodePassword(passwordEncoder)
+
+        return userRepository.save(user)
     }
 
     private fun checkDuplicate(request: SignUpRequest) {

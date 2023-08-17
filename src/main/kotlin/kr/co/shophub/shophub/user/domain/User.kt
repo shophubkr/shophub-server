@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.user.domain
 
 import jakarta.persistence.*
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
 class User(
@@ -9,7 +10,7 @@ class User(
     var id: Long = 0L,
 
     val email: String,
-    val password: String,
+    var password: String,
     val nickname: String,
     val providerId: String = "only-social",
     val profile: String = "only-social",
@@ -21,4 +22,8 @@ class User(
     @Enumerated(EnumType.STRING)
     val providerType: ProviderType = ProviderType.NO_SOCIAL,
 
-)
+) {
+    fun encodePassword(encoder: PasswordEncoder) {
+        this.password = encoder.encode(password)
+    }
+}
