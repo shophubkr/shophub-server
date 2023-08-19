@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/shophub
     username: root
-    password: asdf1234
+    password: rkdmseodud930
 
   jpa:
     show-sql: true
@@ -16,6 +16,9 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql: trace
+  slack:
+    webhook-uri: https://hooks.slack.com/services/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
+  config: classpath:logback/logback-slack.xml
 
 server:
   tomcat:

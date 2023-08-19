@@ -37,6 +37,8 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("com.github.maricn:logback-slack-appender:1.6.1")
+	implementation("org.springframework.boot:spring-boot-starter-logging")
 }
 
 tasks.withType<KotlinCompile> {
