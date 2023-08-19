@@ -16,9 +16,6 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql: trace
-  slack:
-    webhook-uri: https://hooks.slack.com/services/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
-  config: classpath:logback/logback-slack.xml
 
 server:
   tomcat:

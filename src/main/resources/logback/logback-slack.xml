@@ -7,7 +7,16 @@
             <pattern>%n %d{yyyy-MM-dd HH:mm:ss.SSS} %msg %n</pattern>
             <pattern>
                 ${service} %level !!
-                "instanceId": "${pinpoint.agentId}" \n"timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}" \n"severity": "%level" \n"service": "${service}" \n"serverIp": "${java.rmi.server.hostname:-127.0.0.1}" \n"hostName": "${nd.hostname:-localhost}" \n"pid": "${PID:-}" \n"thread": "%t" \n"class": "%logger{100}" \n"rest": "%msg" \n"stack_trace": "%ex{0}"
+                "instanceId": "${pinpoint.agentId}" \n
+                "timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}" \n
+                "severity": "%level" \n"service": "${service}" \n
+                "serverIp": "${java.rmi.server.hostname:-127.0.0.1}" \n
+                "hostName": "${nd.hostname:-localhost}" \n
+                "pid": "${PID:-}" \n
+                "thread": "%t" \n
+                "class": "%logger{100}" \n
+                "rest": "%msg" \n
+                "stack_trace": "%ex{0}"
             </pattern>
         </layout>
         <username>당직병</username>

@@ -15,14 +15,13 @@ class SimpleController {
 
     @GetMapping("/info")
     fun getInfo(): String {
-        logger.info("This is an info log!")
-        return "Info log has been printed."
+        logger.info("This is an info log")
+        return "INFO"
     }
 
     @GetMapping("/error")
     fun getError(): String {
-        val list = listOf("apple", "banana", "cherry")
-        println(list[5])
-        return "Error log has been printed."
+        logger.error("This is an error log")
+        return "ERROR"
     }
 }
