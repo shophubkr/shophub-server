@@ -16,7 +16,7 @@ class UserService(
 ) {
 
     @Transactional
-    fun signUp(request: SignUpRequest): UserResponse {
+    fun join(request: SignUpRequest): UserResponse {
         checkDuplicate(request)
         val user = User(
             email = request.email,

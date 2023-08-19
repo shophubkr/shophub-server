@@ -12,7 +12,7 @@ class UserController(
     private val userService: UserService,
 ) {
 
-    @PostMapping("/sign-up")
-    fun signUp(@RequestBody request: SignUpRequest): UserResponse = userService.signUp(request)
+    @PostMapping("/join")
+    fun signUp(@RequestBody request: SignUpRequest): UserResponse = userService.join(request)
 
 }

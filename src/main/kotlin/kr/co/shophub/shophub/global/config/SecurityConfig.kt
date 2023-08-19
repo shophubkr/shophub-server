@@ -42,7 +42,7 @@ class SecurityConfig(
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers(AntPathRequestMatcher("/sign-up")).permitAll()
+                it.requestMatchers(AntPathRequestMatcher("/join")).permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter::class.java)
