@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.user.service
 
-import kr.co.shophub.shophub.user.controller.dto.SignUpRequest
+import kr.co.shophub.shophub.user.controller.dto.reqeust.SignUpRequest
+import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
 import kr.co.shophub.shophub.user.domain.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -15,7 +16,7 @@ class UserService(
 ) {
 
     @Transactional
-    fun signUp(request: SignUpRequest): User {
+    fun signUp(request: SignUpRequest): UserResponse {
         checkDuplicate(request)
         val user = User(
             email = request.email,
@@ -25,7 +26,7 @@ class UserService(
 
         user.encodePassword(passwordEncoder)
 
-        return userRepository.save(user)
+        return UserResponse.toResponse(userRepository.save(user))
     }
 
     private fun checkDuplicate(request: SignUpRequest) {
