@@ -42,6 +42,7 @@ class SecurityConfig(
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
+                it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/join")).permitAll()
                 it.anyRequest().authenticated()
             }
