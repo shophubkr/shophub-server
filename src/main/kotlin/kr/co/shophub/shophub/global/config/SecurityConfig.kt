@@ -63,7 +63,7 @@ class SecurityConfig(
 
     @Bean
     fun loginFailureHandler(): LoginFailureHandler? {
-        return LoginFailureHandler()
+        return LoginFailureHandler(objectMapper)
     }
 
     @Bean
