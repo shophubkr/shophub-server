@@ -1,6 +1,6 @@
 package kr.co.shophub.shophub.user.controller
 
-import kr.co.shophub.shophub.user.controller.dto.reqeust.SignUpRequest
+import kr.co.shophub.shophub.user.controller.dto.reqeust.JoinRequest
 import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.web.bind.annotation.PostMapping
@@ -13,6 +13,6 @@ class UserController(
 ) {
 
     @PostMapping("/join")
-    fun signUp(@RequestBody request: SignUpRequest): UserResponse = userService.join(request)
+    fun signUp(@RequestBody request: JoinRequest): UserResponse = userService.join(request)
 
 }

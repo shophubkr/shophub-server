@@ -1,6 +1,6 @@
 package kr.co.shophub.shophub.user.service
 
-import kr.co.shophub.shophub.user.controller.dto.reqeust.SignUpRequest
+import kr.co.shophub.shophub.user.controller.dto.reqeust.JoinRequest
 import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
 import kr.co.shophub.shophub.user.domain.User
 import kr.co.shophub.shophub.user.repository.UserRepository
@@ -16,7 +16,7 @@ class UserService(
 ) {
 
     @Transactional
-    fun join(request: SignUpRequest): UserResponse {
+    fun join(request: JoinRequest): UserResponse {
         checkDuplicate(request)
         val user = User(
             email = request.email,
@@ -29,7 +29,7 @@ class UserService(
         return UserResponse.toResponse(userRepository.save(user))
     }
 
-    private fun checkDuplicate(request: SignUpRequest) {
+    private fun checkDuplicate(request: JoinRequest) {
         if (userRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("이미 가입한 이메일 입니다.")
         }
