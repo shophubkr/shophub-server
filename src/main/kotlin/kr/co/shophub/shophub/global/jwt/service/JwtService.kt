@@ -2,6 +2,7 @@ package kr.co.shophub.shophub.global.jwt.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -27,6 +28,8 @@ class JwtService(
 
     @Value("\${jwt.refresh.header}")
     val refreshHeader: String,
+
+    private val objectMapper: ObjectMapper,
 ) {
 
     companion object {
@@ -56,11 +59,17 @@ class JwtService(
     fun sendAccessAndRefreshToken(
         response: HttpServletResponse,
         accessToken: String,
-        refreshToken: String?
+        refreshToken: String
     ) {
         response.status = HttpServletResponse.SC_OK
-        response.setHeader(accessHeader, accessToken)
-        response.setHeader(refreshHeader, refreshToken)
+        response.characterEncoding = "UTF-8"
+        response.contentType = "application/json;charset=UTF-8"
+
+        val data = mutableMapOf<String, Any>()
+        data[accessHeader] = accessToken
+        data[refreshHeader] = refreshToken
+        response.writer.println(objectMapper.writeValueAsString(data))
+
     }
 
     fun extractAccessToken(request: HttpServletRequest): String? {
