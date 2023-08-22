@@ -21,7 +21,6 @@ class SimpleController {
 
     @GetMapping("/error")
     fun getError(): String {
-        logger.error("This is an error log")
-        return "ERROR"
+        throw Exception("test")
     }
 }
