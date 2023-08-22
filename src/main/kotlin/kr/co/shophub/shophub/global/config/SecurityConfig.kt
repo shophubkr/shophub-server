@@ -35,11 +35,9 @@ class SecurityConfig(
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
-                it.requestMatchers(AntPathRequestMatcher("/join")).permitAll()
-                it.requestMatchers(AntPathRequestMatcher("/refresh")).permitAll()
-                it.requestMatchers(AntPathRequestMatcher("/login")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/")).permitAll()
+                it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
+                it.requestMatchers(AntPathRequestMatcher("/auth/**")).permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)

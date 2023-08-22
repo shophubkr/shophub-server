@@ -9,6 +9,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.http.HttpServletRequest
 import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
+import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -31,6 +32,7 @@ class JwtService(
     private val refreshTokenExpirationPeriod: Long,
 
     private val loginService: LoginService,
+    private val userRepository: UserRepository,
 ) {
 
     companion object {
@@ -41,7 +43,15 @@ class JwtService(
         const val JWT_TOKEN: String = "Authorization"
     }
 
-    fun createAccessToken(email: String): String {
+    fun makeTokenResponse(email: String): TokenResponse {
+        val accessToken = createAccessToken(email)
+        val refreshToken = createRefreshToken()
+        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException()
+        user.updateRefreshToken(refreshToken)
+        return TokenResponse(accessToken, refreshToken)
+    }
+
+    private fun createAccessToken(email: String): String {
         val now = Date()
         return JWT.create()
             .withSubject(ACCESS_TOKEN_SUBJECT)
@@ -50,7 +60,7 @@ class JwtService(
             .sign(Algorithm.HMAC512(secretKey))
     }
 
-    fun createRefreshToken(): String {
+    private fun createRefreshToken(): String {
         val now = Date()
         return JWT.create()
             .withSubject(REFRESH_TOKEN_SUBJECT)
@@ -65,7 +75,19 @@ class JwtService(
         } else null
     }
 
-    fun extractEmail(accessToken: String?): String? {
+    fun getAuthentication(headerToken: String): Authentication? {
+        val email = extractEmail(headerToken)
+        return if (email != null) {
+            val userDetails = loginService.loadUserByUsername(email)
+            UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                NullAuthoritiesMapper().mapAuthorities(userDetails.authorities)
+            )
+        } else null
+    }
+
+    private fun extractEmail(accessToken: String?): String? {
         return try {
             JWT.require(Algorithm.HMAC512(secretKey))
                 .build()
@@ -99,24 +121,6 @@ class JwtService(
             println("토큰 문제")
             false
         }
-    }
-
-    fun getAuthentication(headerToken: String): Authentication? {
-        val email = extractEmail(headerToken)
-        return if (email != null) {
-            val userDetails = loginService.loadUserByUsername(email)
-            UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                NullAuthoritiesMapper().mapAuthorities(userDetails.authorities)
-            )
-        } else null
-    }
-
-    fun getTokenResponse(email: String): TokenResponse {
-        val accessToken = createAccessToken(email)
-        val refreshToken = createRefreshToken()
-        return TokenResponse(accessToken, refreshToken)
     }
 
 }

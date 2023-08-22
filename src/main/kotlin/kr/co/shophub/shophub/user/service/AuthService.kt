@@ -7,10 +7,8 @@ import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
 import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
 import kr.co.shophub.shophub.user.domain.User
 import kr.co.shophub.shophub.user.repository.UserRepository
-import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,9 +30,7 @@ class AuthService(
             password = request.password,
             nickname = request.nickname,
         )
-
         user.encodePassword(passwordEncoder)
-
         return UserResponse.toResponse(userRepository.save(user))
     }
 
@@ -51,24 +47,21 @@ class AuthService(
     fun login(authRequest: UsernamePasswordAuthenticationToken): LoginResponse {
         val authentication = authenticationManager.authenticate(authRequest)
         val email = authentication.name
-        val tokenResponse = jwtService.getTokenResponse(email)
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException()
-        user.updateRefreshToken(tokenResponse.refreshToken)
-        return LoginResponse(
-            tokenResponse,
-            HttpStatus.OK
-        )
+        val tokenResponse = jwtService.makeTokenResponse(email)
+        return LoginResponse(tokenResponse)
     }
 
     @Transactional
-    fun reIssueToken(refreshToken: String, authentication: Authentication): TokenResponse {
-        if (!jwtService.isTokenValid(refreshToken)) {
-            throw IllegalArgumentException()
-        }
-        val tokenResponse = jwtService.getTokenResponse(authentication.name)
+    fun reIssueToken(refreshToken: String): TokenResponse {
+        checkToken(refreshToken)
         val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException()
-        user.updateRefreshToken(tokenResponse.refreshToken)
-        return tokenResponse
+        return jwtService.makeTokenResponse(user.email)
+    }
+
+    private fun checkToken(refreshToken: String) {
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw IllegalArgumentException("토큰이 유효하지 않습니다.")
+        }
     }
 
 }
