@@ -39,26 +39,44 @@ class SlackNotificationAspect(
         threadPoolTaskExecutor.execute { sendSlackMessage(requestCopy, e) }
     }
 
-    private fun sendSlackMessage(request: HttpServletRequest, e: Exception) {
-        val slackAttachment = SlackAttachment()
-        slackAttachment.setFallback("Error")
-        slackAttachment.setColor("danger")
-        slackAttachment.setFields(
-            listOf<SlackField>(
-                SlackField().setTitle("Exception class").setValue(e.javaClass.getCanonicalName()),
-                SlackField().setTitle("예외 메시지").setValue(e.message),
-                SlackField().setTitle("Request URL").setValue(request.requestURL.toString()),
-                SlackField().setTitle("Request Method").setValue(request.method),
-                SlackField().setTitle("요청 시간")
-                    .setValue(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))),
-                SlackField().setTitle("Request IP").setValue(request.remoteAddr),
-                SlackField().setTitle("Profile 정보").setValue(environment.activeProfiles.contentToString())
-            )
-        )
+    fun sendSlackMessage(request: HttpServletRequest, e: Exception) {
+        val slackMessage = constructSlackMessage(request, e)
+        slackApi.call(slackMessage)
+    }
+
+    private fun constructSlackMessage(request: HttpServletRequest, e: Exception): SlackMessage {
+        val slackAttachment = constructSlackAttachment(request, e)
         val slackMessage = SlackMessage()
         slackMessage.setAttachments(listOf(slackAttachment))
         slackMessage.setText("!!에러 발생!!")
         slackMessage.setUsername("당직병")
-        slackApi.call(slackMessage)
+        return slackMessage
+    }
+
+    private fun constructSlackAttachment(request: HttpServletRequest, e: Exception): SlackAttachment {
+        val slackAttachment = SlackAttachment()
+        slackAttachment.setFallback("Error")
+        slackAttachment.setColor("danger")
+        slackAttachment.setFields(listOf(
+            constructSlackField("Exception class", e.javaClass.canonicalName),
+            constructSlackField("예외 메시지", e.message ?: ""),
+            constructSlackField("Request URL", request.requestURL.toString()),
+            constructSlackField("Request Method", request.method),
+            constructSlackField("요청 시간", currentTime()),
+            constructSlackField("Request IP", request.remoteAddr),
+            constructSlackField("Profile 정보", environment.activeProfiles.contentToString())
+        ))
+        return slackAttachment
+    }
+
+    private fun constructSlackField(title: String, value: String): SlackField {
+        val slackField = SlackField()
+        slackField.setTitle(title)
+        slackField.setValue(value)
+        return slackField
+    }
+
+    private fun currentTime(): String {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     }
 }

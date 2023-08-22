@@ -12,8 +12,8 @@ class ThreadPoolConfig {
     @Bean
     fun threadPoolTaskExecutor(): ThreadPoolTaskExecutor {
         val threadPoolTaskExecutor = ThreadPoolTaskExecutor()
-        threadPoolTaskExecutor.maxPoolSize = 5 //최대 스레드 수
-        threadPoolTaskExecutor.corePoolSize = 5 //기본 스레드 수
+        threadPoolTaskExecutor.maxPoolSize = 3
+        threadPoolTaskExecutor.corePoolSize = 3
         threadPoolTaskExecutor.initialize()
         threadPoolTaskExecutor.setThreadNamePrefix("AsyncThread-")
         return threadPoolTaskExecutor
