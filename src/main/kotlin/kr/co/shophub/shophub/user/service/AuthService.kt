@@ -2,7 +2,6 @@ package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.controller.dto.reqeust.JoinRequest
-import kr.co.shophub.shophub.user.controller.dto.response.LoginResponse
 import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
 import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
 import kr.co.shophub.shophub.user.domain.User
@@ -44,11 +43,10 @@ class AuthService(
     }
 
     @Transactional
-    fun login(authRequest: UsernamePasswordAuthenticationToken): LoginResponse {
+    fun login(authRequest: UsernamePasswordAuthenticationToken): TokenResponse {
         val authentication = authenticationManager.authenticate(authRequest)
         val email = authentication.name
-        val tokenResponse = jwtService.makeTokenResponse(email)
-        return LoginResponse(tokenResponse)
+        return jwtService.makeTokenResponse(email)
     }
 
     @Transactional
