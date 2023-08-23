@@ -11,19 +11,11 @@ class JwtAuthenticationProcessingFilter(
     private val jwtService: JwtService,
 ) : OncePerRequestFilter() {
 
-    companion object {
-        const val NO_CHECK_URL = "/login"
-    }
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        if (request.requestURI.equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response)
-            return
-        }
 
         val headerToken = jwtService.extractToken(request)
 
