@@ -38,4 +38,5 @@ out/
 
 ### Custom ###
 application-ec2-dev.yml
+**/application-jwt.yml
 tomcat
