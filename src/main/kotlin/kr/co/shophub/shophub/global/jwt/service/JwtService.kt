@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -41,6 +42,8 @@ class JwtService(
         const val EMAIL_CLAIM: String = "email"
         const val BEARER: String = "Bearer "
         const val JWT_TOKEN: String = "Authorization"
+
+        private val logger = LoggerFactory.getLogger(JwtService::class.java)
     }
 
     fun makeTokenResponse(email: String): TokenResponse {
@@ -109,16 +112,16 @@ class JwtService(
                 .build().verify(token)
             true
         } catch (e: TokenExpiredException) {
-            println("토큰 만료")
+            logger.info("토큰 만료")
             false
         } catch (e: AlgorithmMismatchException) {
-            println("알고리즘 불일치")
+            logger.info("알고리즘 불일치")
             false
         } catch (e: SignatureVerificationException) {
-            println("서명 불일치")
+            logger.info("서명 불일치")
             false
         } catch (e: JWTVerificationException) {
-            println("토큰 문제")
+            logger.info("토큰 문제")
             false
         }
     }
