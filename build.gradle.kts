@@ -9,6 +9,9 @@ plugins {
 }
 
 configurations {
+	all {
+		exclude(group = "commons-logging", module = "commons-logging")
+	}
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
@@ -33,6 +36,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation ("com.auth0:java-jwt:4.2.1")
+	implementation("io.github.oshai:kotlin-logging:5.0.0")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	runtimeOnly("com.h2database:h2")
