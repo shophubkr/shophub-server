@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.user.controller
 
+import kr.co.shophub.shophub.global.dto.CommonResponse
+import kr.co.shophub.shophub.global.error.UnauthenticatedException
 import kr.co.shophub.shophub.user.controller.dto.reqeust.JoinRequest
 import kr.co.shophub.shophub.user.controller.dto.reqeust.LoginRequest
 import kr.co.shophub.shophub.user.controller.dto.reqeust.TokenRequest
@@ -20,19 +22,19 @@ class AuthController(
 ) {
 
     @PostMapping("/login")
-    fun login(@RequestBody loginRequest: LoginRequest): ResponseEntity<TokenResponse> {
+    fun login(@RequestBody loginRequest: LoginRequest): CommonResponse<TokenResponse> {
         val authRequest = loginRequest.toAuthenticationToken()
-        return ResponseEntity.ok(authService.login(authRequest))
+        return CommonResponse(authService.login(authRequest))
     }
 
     @PostMapping("/join")
-    fun join(@RequestBody joinRequest: JoinRequest): ResponseEntity<UserResponse> {
-        return ResponseEntity.ok(authService.join(joinRequest))
+    fun join(@RequestBody joinRequest: JoinRequest): CommonResponse<UserResponse> {
+        return CommonResponse(authService.join(joinRequest))
     }
 
     @PostMapping("/reissue")
-    fun refresh(@RequestBody tokenRequest: TokenRequest): ResponseEntity<TokenResponse> {
-        return ResponseEntity.ok(authService.reIssueToken(tokenRequest.refreshToken))
+    fun refresh(@RequestBody tokenRequest: TokenRequest): CommonResponse<TokenResponse> {
+        return CommonResponse(authService.reIssueToken(tokenRequest.refreshToken))
     }
 
     @GetMapping("/test")
