@@ -18,7 +18,7 @@ class JwtAuthenticationEntryPoint(
     override fun commence(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authException: AuthenticationException?
+        authException: AuthenticationException
     ) {
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.characterEncoding = "utf-8"
