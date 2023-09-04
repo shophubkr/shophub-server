@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/shophub
     username: root
-    password: asdf1234
+    password: rkdmseodud930
 
   jpa:
     show-sql: true

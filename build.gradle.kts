@@ -38,6 +38,7 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 }
 
 tasks.withType<KotlinCompile> {
