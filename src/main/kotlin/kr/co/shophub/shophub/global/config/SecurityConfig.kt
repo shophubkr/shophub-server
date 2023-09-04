@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.global.config
 
+import kr.co.shophub.shophub.global.jwt.error.JwtAccessDeniedHandler
+import kr.co.shophub.shophub.global.jwt.error.JwtAuthenticationEntryPoint
 import kr.co.shophub.shophub.global.jwt.filter.JwtAuthenticationProcessingFilter
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.global.login.service.LoginService
@@ -25,6 +27,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 class SecurityConfig(
     private val loginService: LoginService,
     private val jwtService: JwtService,
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
 ) {
 
     @Bean
@@ -34,6 +38,11 @@ class SecurityConfig(
             .formLogin(FormLoginConfigurer<HttpSecurity>::disable)
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .exceptionHandling { exceptionHandling ->
+                exceptionHandling
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                    .accessDeniedHandler(jwtAccessDeniedHandler)
+            }
             .authorizeHttpRequests {
                 it.requestMatchers(AntPathRequestMatcher("/")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
