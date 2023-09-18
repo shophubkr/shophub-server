@@ -43,6 +43,11 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
+
+	//kotest + mockk
+	testImplementation ("io.kotest:kotest-runner-junit5:5.7")
+	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
+	testImplementation("io.mockk:mockk:1.13.7")
 }
 
 tasks.withType<KotlinCompile> {
@@ -56,6 +61,6 @@ tasks.named<Jar>("jar") {
 	enabled = false
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
