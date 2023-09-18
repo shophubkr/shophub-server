@@ -52,7 +52,7 @@ class AuthService(
     @Transactional
     fun reIssueToken(refreshToken: String): TokenResponse {
         checkToken(refreshToken)
-        val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException()
+        val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException("유저 정보를 찾을 수 없습니다.")
         return jwtService.makeTokenResponse(user.email)
     }
 
