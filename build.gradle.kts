@@ -45,8 +45,8 @@ dependencies {
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 
 	//kotest + mockk
-	testImplementation ("io.kotest:kotest-runner-junit5:$version")
 	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
+	testImplementation("io.kotest:kotest-assertions-core-jvm:4.6.0")
 	testImplementation("io.mockk:mockk:1.13.7")
 }
 
