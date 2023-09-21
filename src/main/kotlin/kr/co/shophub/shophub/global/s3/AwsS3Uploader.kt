@@ -19,11 +19,11 @@ class AwsS3Uploader(
     @Value("\${cloud.aws.s3.bucket}")
     lateinit var bucket: String
 
-    fun upload(file: MultipartFile): String {
+    fun upload(file: MultipartFile, directoryName: String): String {
         val fileName = file.originalFilename ?: throw IllegalArgumentException("올바른 파일 이름 형식이 아닙니다.")
         validateExtension(fileName)
 
-        val createFileName = createFileName(fileName)
+        val createFileName = createFileName(fileName, directoryName)
         val objMeta = ObjectMetadata()
         val bytes = IOUtils.toByteArray(file.inputStream)
         objMeta.contentLength = bytes.size.toLong()
@@ -33,11 +33,11 @@ class AwsS3Uploader(
             PutObjectRequest(bucket, createFileName, byteArrayIs, objMeta)
             .withCannedAcl(CannedAccessControlList.PublicRead))
 
-        return amazonS3Client.getUrl(bucket, fileName).toString()
+        return amazonS3Client.getUrl(bucket, createFileName).toString()
     }
 
-    private fun createFileName(fileName: String): String {
-        return (UUID.randomUUID()).toString() + fileName
+    private fun createFileName(fileName: String, directoryName: String): String {
+        return "$directoryName/${UUID.randomUUID()}$fileName"
     }
 
     private fun validateExtension(fileName: String) {
