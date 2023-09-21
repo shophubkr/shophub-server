@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.user.domain
+package kr.co.shophub.shophub.user.model
 
 enum class UserRole {
     GUEST,

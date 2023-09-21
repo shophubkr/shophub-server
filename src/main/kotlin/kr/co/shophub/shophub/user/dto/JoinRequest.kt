@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.user.controller.dto.reqeust
+package kr.co.shophub.shophub.user.dto
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank

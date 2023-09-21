@@ -1,6 +1,6 @@
-package kr.co.shophub.shophub.user.controller.dto.response
+package kr.co.shophub.shophub.user.dto
 
-import kr.co.shophub.shophub.user.domain.User
+import kr.co.shophub.shophub.user.model.User
 
 data class UserResponse(
     val id: Long,

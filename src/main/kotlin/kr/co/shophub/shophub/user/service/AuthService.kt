@@ -1,10 +1,10 @@
 package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.global.jwt.service.JwtService
-import kr.co.shophub.shophub.user.controller.dto.reqeust.JoinRequest
-import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
-import kr.co.shophub.shophub.user.controller.dto.response.UserResponse
-import kr.co.shophub.shophub.user.domain.User
+import kr.co.shophub.shophub.user.dto.JoinRequest
+import kr.co.shophub.shophub.user.dto.TokenResponse
+import kr.co.shophub.shophub.user.dto.UserResponse
+import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -34,12 +34,8 @@ class AuthService(
     }
 
     private fun checkDuplicate(request: JoinRequest) {
-        if (userRepository.existsByEmail(request.email)) {
-            throw IllegalArgumentException("이미 가입한 이메일 입니다.")
-        }
-        if (userRepository.existsByNickname(request.nickname)) {
-            throw IllegalArgumentException("이미 가입한 닉네임 입니다.")
-        }
+        check(!userRepository.existsByEmail(request.email)) { "이미 가입한 이메일 입니다." }
+        check(!userRepository.existsByNickname(request.nickname)) { "이미 가입한 닉네임 입니다." }
     }
 
     @Transactional
@@ -52,14 +48,12 @@ class AuthService(
     @Transactional
     fun reIssueToken(refreshToken: String): TokenResponse {
         checkToken(refreshToken)
-        val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException()
+        val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
         return jwtService.makeTokenResponse(user.email)
     }
 
     private fun checkToken(refreshToken: String) {
-        if (!jwtService.isTokenValid(refreshToken)) {
-            throw IllegalArgumentException("토큰이 유효하지 않습니다.")
-        }
+        require(jwtService.isTokenValid(refreshToken)) { "토큰이 유효하지 않습니다." }
     }
 
 }

@@ -8,7 +8,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.http.HttpServletRequest
 import kr.co.shophub.shophub.global.login.service.LoginService
-import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
+import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
