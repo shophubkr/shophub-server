@@ -30,6 +30,18 @@ jobs:
           echo "YAML_SECRET has been decoded and saved to $YAML_DIR/$YAML_FILE_NAME"
           echo "YAML_SECRET has been decoded and saved to $YAML_TEST_DIR/$YAML_FILE_NAME"
 
+      - name: Set up oauth2 yml file
+        env:
+          YAML_SECRET: ${{ secrets.YAML_OAUTH2 }}
+          YAML_DIR: src/main/resources
+          YAML_TEST_DIR: src/test/resources
+          YAML_FILE_NAME: application-oauth.yml
+        run: |
+          echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
+          echo $YAML_SECRET | base64 --decode > $YAML_TEST_DIR/$YAML_FILE_NAME
+          echo "YAML_SECRET has been decoded and saved to $YAML_DIR/$YAML_FILE_NAME"
+          echo "YAML_SECRET has been decoded and saved to $YAML_TEST_DIR/$YAML_FILE_NAME"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
