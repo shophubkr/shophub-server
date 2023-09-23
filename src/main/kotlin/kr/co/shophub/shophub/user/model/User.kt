@@ -1,6 +1,8 @@
 package kr.co.shophub.shophub.user.model
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotNull
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
@@ -9,13 +11,21 @@ class User(
     @Column(name = "user_id")
     var id: Long = 0L,
 
+    @field:Email
     val email: String,
+
+    @field:NotNull
     var password: String,
+
+    @field:NotNull
     val nickname: String,
+
     var refreshToken: String = "empty",
     val providerId: String = "only-social",
     val profile: String = "only-social",
-    var isDeleted: Boolean = false,
+
+    @Column(name = "is_deleted")
+    private var deleted: Boolean = false,
 
     @Enumerated(EnumType.STRING)
     val userRole: UserRole = UserRole.GUEST,
