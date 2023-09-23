@@ -39,4 +39,5 @@ out/
 ### Custom ###
 application-ec2-dev.yml
 **/application-jwt.yml
+**/application-oauth.yml
 tomcat

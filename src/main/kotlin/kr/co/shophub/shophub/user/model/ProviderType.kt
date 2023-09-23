@@ -1,8 +1,10 @@
 package kr.co.shophub.shophub.user.model
 
-enum class ProviderType {
-    GOOGLE,
-    NAVER,
-    KAKAO,
-    NO_SOCIAL,
+enum class ProviderType(
+    val description: String,
+) {
+    GOOGLE("google"),
+    NAVER("naver"),
+    KAKAO("kakao"),
+    NO_SOCIAL("no_social");
 }
