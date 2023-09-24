@@ -64,6 +64,6 @@ tasks.named<Jar>("jar") {
 	enabled = false
 }
 
-tasks.withType<Test>().configureEach {
+tasks.withType<Test>().configureEach  {
 	useJUnitPlatform()
 }
