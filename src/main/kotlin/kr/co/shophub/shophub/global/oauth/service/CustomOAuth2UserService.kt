@@ -36,6 +36,11 @@ class CustomOAuth2UserService(
 
         val user = getUser(extractAttributes!!, socialType)
 
+        // 자동 연동 구현은 우선 문제가 생겨서 구현을 미루겠습니다.
+        if (userRepository.existsByEmail(user.email)) {
+            throw IllegalArgumentException("이미 가입돤 이메일 입니다.")
+        }
+
         return CustomOAuth2User(
             Collections.singleton(SimpleGrantedAuthority(user.userRole.name)),
             attributes,

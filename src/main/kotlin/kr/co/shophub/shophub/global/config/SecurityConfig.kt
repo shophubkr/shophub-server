@@ -6,7 +6,7 @@ import kr.co.shophub.shophub.global.jwt.error.JwtAuthenticationEntryPoint
 import kr.co.shophub.shophub.global.jwt.filter.JwtAuthenticationProcessingFilter
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.global.login.service.LoginService
-import kr.co.shophub.shophub.global.oauth.handler.OAuth2LoginSuccessHandlerV2
+import kr.co.shophub.shophub.global.oauth.handler.OAuth2LoginSuccessHandler
 import kr.co.shophub.shophub.global.oauth.service.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -32,7 +32,7 @@ class SecurityConfig(
     private val jwtService: JwtService,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
-    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandlerV2,
+    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler,
     private val oAuth2LoginFailureHandler: OAuth2LoginFailureHandler,
     private val customOAuth2UserService: CustomOAuth2UserService,
 ) {

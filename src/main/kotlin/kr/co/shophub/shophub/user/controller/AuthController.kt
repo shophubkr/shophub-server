@@ -8,7 +8,6 @@ import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.dto.UserResponse
 import kr.co.shophub.shophub.user.service.AuthService
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,9 +36,10 @@ class AuthController(
         return CommonResponse(authService.reIssueToken(tokenRequest.refreshToken))
     }
 
-    @GetMapping("/code/{typeDescription}")
-    fun ss(@RequestParam refreshToken: String, @PathVariable typeDescription: String): CommonResponse<TokenResponse> {
-        return CommonResponse(authService.reIssueToken(refreshToken))
+    @GetMapping("/code")
+    fun issueTokenOfOAuthUser(@RequestParam email: String): CommonResponse<TokenResponse> {
+        val tokenResponse: TokenResponse = authService.issueTokenOfOAuth(email)
+        return CommonResponse(tokenResponse)
     }
 
     @GetMapping("/test")

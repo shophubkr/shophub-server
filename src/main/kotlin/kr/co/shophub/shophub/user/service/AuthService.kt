@@ -52,6 +52,11 @@ class AuthService(
         return jwtService.makeTokenResponse(user.email)
     }
 
+    @Transactional
+    fun issueTokenOfOAuth(email: String): TokenResponse {
+        return jwtService.makeTokenResponse(email)
+    }
+
     private fun checkToken(refreshToken: String) {
         require(jwtService.isTokenValid(refreshToken)) { "토큰이 유효하지 않습니다." }
     }
