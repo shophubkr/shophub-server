@@ -16,7 +16,7 @@ class ProductCategory(
     @field:NotNull
     var name: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product")
     var product: Product,
 
