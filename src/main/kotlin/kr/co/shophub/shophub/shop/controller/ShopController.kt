@@ -3,10 +3,9 @@ package kr.co.shophub.shophub.shop.controller
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.dto.PageInfo
-import kr.co.shophub.shophub.global.login.SecurityUtils.getLoginUserId
+import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.shop.dto.*
 import kr.co.shophub.shophub.shop.service.ShopService
-import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/shops")
 class ShopController(
     private val shopService: ShopService,
-    private val userRepository: UserRepository
+    private val loginService: LoginService
 ) {
 
     @PostMapping("")
@@ -26,7 +25,7 @@ class ShopController(
     ): CommonResponse<ShopIdResponse> {
 
         return shopService.createShop(
-            sellerId = getLoginUserId(userRepository),
+            sellerId = loginService.getLoginUserId(),
             createShopRequest = createShopRequest
         )
             .let { CommonResponse(it) }
@@ -63,7 +62,7 @@ class ShopController(
 
         return shopService.changeShop(
             shopId = shopId,
-            sellerId = getLoginUserId(userRepository),
+            sellerId = loginService.getLoginUserId(),
             changeShopRequest = changeShopRequest
         )
             .let { CommonResponse(it) }
@@ -78,7 +77,7 @@ class ShopController(
 
         shopService.deleteShop(
             shopId = shopId,
-            sellerId = getLoginUserId(userRepository)
+            sellerId = loginService.getLoginUserId(),
         )
         return CommonResponse.EMPTY
 
