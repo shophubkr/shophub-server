@@ -35,10 +35,10 @@ class AuthService(
 
     private fun checkDuplicate(request: JoinRequest) {
         if (userRepository.existsByEmail(request.email)) {
-            throw IllegalArgumentException("이미 가입한 이메일 입니다.")
+            throw IllegalStateException("이미 가입한 이메일 입니다.")
         }
         if (userRepository.existsByNickname(request.nickname)) {
-            throw IllegalArgumentException("이미 가입한 닉네임 입니다.")
+            throw IllegalStateException("이미 가입한 닉네임 입니다.")
         }
     }
 
