@@ -24,7 +24,6 @@ class ShopService(
     @Transactional
     fun createShop(sellerId: Long, createShopRequest: CreateShopRequest): ShopIdResponse {
         validateShopRequest(createShopRequest.images.size, createShopRequest.tags.size)
-        checkDuplicateShop(createShopRequest.name, createShopRequest.telNum)
 
         val shop = Shop(createShopRequest, sellerId)
         val savedShop = shopRepository.save(shop)
@@ -46,7 +45,6 @@ class ShopService(
     @Transactional
     fun changeShop(shopId: Long, sellerId: Long, changeShopRequest: ChangeShopRequest): ShopIdResponse {
         validateShopRequest(changeShopRequest.images.size, changeShopRequest.tags.size)
-        checkDuplicateShop(changeShopRequest.name, changeShopRequest.telNum)
 
         val shop = findShop(shopId)
         check(shop.sellerId == sellerId) { "변경 권한이 없습니다." }
@@ -62,6 +60,10 @@ class ShopService(
         val shop = findShop(shopId)
         check(shop.sellerId == sellerId) { "삭제 권한이 없습니다." }
         shop.softDelete()
+    }
+
+    fun checkShopName(name: String): Boolean {
+        return shopRepository.existsByNameAndDeletedIsFalse(name)
     }
 
     private fun replaceShopImages(shop: Shop, imageList: List<String>) {
@@ -81,11 +83,6 @@ class ShopService(
     private fun validateShopRequest(imageSize: Int, tagSize: Int) {
         require(imageSize >= MIN_IMAGE_COUNT) { "이미지 최소 갯수는 $MIN_IMAGE_COUNT 개 입니다." }
         require(tagSize <= MAX_TAG_COUNT) { "태그 최대 갯수는 $MAX_TAG_COUNT 개 입니다." }
-    }
-
-    private fun checkDuplicateShop(name: String, telNum: String) {
-        val duplicateShop = shopRepository.findAllByNameAndTelNumAndDeletedIsFalse(name, telNum)
-        require(duplicateShop.isEmpty()) { "이미 존재하는 이름 또는 번호입니다." }
     }
 
     fun findShop(shopId: Long): Shop {

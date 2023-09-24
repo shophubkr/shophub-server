@@ -68,17 +68,6 @@ class ShopServiceTest : BehaviorSpec({
             }
         }
 
-        When("이미 존재하는 이름 또는 번호로 요청이 들어올 때") {
-            every { shopRepository.findAllByNameAndTelNumAndDeletedIsFalse(any(), any()) } returns listOf(shop)
-
-            val exception = shouldThrow<IllegalArgumentException> {
-                shopService.createShop(sellerId, createShopRequest)
-            }
-
-            Then("예외가 발생해야 함") {
-                exception.message shouldBe "이미 존재하는 이름 또는 번호입니다."
-            }
-        }
 
         When("이미지나 태그 갯수가 잘못된 경우") {
             val invalidRequest = createShopRequest.copy(
@@ -147,18 +136,6 @@ class ShopServiceTest : BehaviorSpec({
             }
         }
 
-        When("이미 존재하는 이름 또는 번호로 요청이 들어올 때") {
-            every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
-            every { shopRepository.findAllByNameAndTelNumAndDeletedIsFalse(any(), any()) } returns listOf(shop)
-
-            val exception = shouldThrow<IllegalArgumentException> {
-                shopService.changeShop(shopId, sellerId, changeShopRequest)
-            }
-
-            Then("예외가 발생해야 함") {
-                exception.message shouldBe "이미 존재하는 이름 또는 번호입니다."
-            }
-        }
     }
 
     Given("deleteShop 메서드") {

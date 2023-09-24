@@ -82,4 +82,13 @@ class ShopController(
         return CommonResponse.EMPTY
 
     }
+
+    @GetMapping("/check/{shopName}")
+    fun checkShopName(
+        @PathVariable shopName: String
+    ): CommonResponse<Boolean> {
+
+        return CommonResponse(shopService.checkShopName(shopName))
+
+    }
 }

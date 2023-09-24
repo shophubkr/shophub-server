@@ -9,4 +9,5 @@ interface ShopRepository : JpaRepository<Shop, Long> {
     fun findAllByNameAndTelNumAndDeletedIsFalse(name: String, telNum: String): List<Shop>
     fun findByIdAndDeletedIsFalse(id: Long): Shop?
     fun findAllByDeletedIsFalse(pageable: Pageable): Page<Shop>
+    fun existsByNameAndDeletedIsFalse(name: String): Boolean
 }
