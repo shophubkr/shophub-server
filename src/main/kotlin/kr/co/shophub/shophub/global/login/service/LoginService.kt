@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.global.login.service
 
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
+import kr.co.shophub.shophub.global.login.SecurityUtils.getLoginUserId
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -22,6 +23,10 @@ class LoginService(
             .password(user.password)
             .roles(user.userRole.name)
             .build()
+    }
+
+    fun getLoginUserId() : Long{
+        return getLoginUserId(userRepository)
     }
 
 }
