@@ -47,6 +47,7 @@ class SecurityConfig(
                 it.requestMatchers(AntPathRequestMatcher("/")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/auth/**")).permitAll()
+                it.requestMatchers(AntPathRequestMatcher("/test/**")).permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)
