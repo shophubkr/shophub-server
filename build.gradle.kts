@@ -43,13 +43,14 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
+	implementation("io.awspring.cloud:spring-cloud-starter-aws:2.4.4")
 
 	//kotest + mockk
 	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
 	testImplementation("io.kotest:kotest-assertions-core-jvm:4.6.0")
 	testImplementation("io.mockk:mockk:1.13.7")
-
-	//oauth2
+  
+  //oauth2
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }
 
