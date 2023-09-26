@@ -16,7 +16,7 @@ class PasswordUtil {
             )
             val password = StringBuffer()
             val random = Random()
-            for (i in 0..7) {
+            for (i in 0..15) {
                 val rd = random.nextDouble()
                 index = (charSet.size * rd).toInt()
                 password.append(charSet[index])
