@@ -53,6 +53,7 @@ class SecurityConfig(
                 it.requestMatchers(AntPathRequestMatcher("/")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
                 it.requestMatchers(AntPathRequestMatcher("/api/v1/auth/**")).permitAll()
+                it.requestMatchers(AntPathRequestMatcher("/test/**")).permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login {
