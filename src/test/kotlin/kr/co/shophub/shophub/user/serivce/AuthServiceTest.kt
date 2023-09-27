@@ -11,6 +11,7 @@ import kr.co.shophub.shophub.user.dto.JoinRequest
 import kr.co.shophub.shophub.user.dto.LoginRequest
 import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.AuthService
 import org.springframework.security.authentication.AuthenticationManager
@@ -38,6 +39,7 @@ class AuthServiceTest : BehaviorSpec({
             "test@test.com",
             "password",
             "name",
+            UserRole.GUEST_BUYER
         )
 
         val user = User(
