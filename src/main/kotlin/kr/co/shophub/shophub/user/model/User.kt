@@ -12,7 +12,7 @@ class User(
     var id: Long = 0L,
 
     @field:Email
-    val email: String,
+    var email: String,
 
     @field:NotNull
     var password: String,
@@ -28,7 +28,7 @@ class User(
     private var deleted: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    val userRole: UserRole = UserRole.GUEST,
+    var userRole: UserRole = UserRole.GUEST_BUYER,
 
     @Enumerated(EnumType.STRING)
     val providerType: ProviderType = ProviderType.NO_SOCIAL,
@@ -41,4 +41,17 @@ class User(
     fun updateRefreshToken(updateRefreshToken: String) {
         this.refreshToken = updateRefreshToken
     }
+
+    fun updateEmail(newEmail: String) {
+        this.email = newEmail
+    }
+
+    fun updateRole() {
+        if (this.userRole == UserRole.GUEST_BUYER) {
+            this.userRole = UserRole.USER
+        } else {
+            this.userRole = UserRole.SELLER
+        }
+    }
+
 }

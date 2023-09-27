@@ -5,12 +5,14 @@ import kr.co.shophub.shophub.user.dto.JoinRequest
 import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.dto.UserResponse
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
@@ -24,13 +26,23 @@ class AuthService(
     @Transactional
     fun join(request: JoinRequest): UserResponse {
         checkDuplicate(request)
+        val userRole = checkRole(request.role)
         val user = User(
             email = request.email,
             password = request.password,
             nickname = request.nickname,
+            userRole = userRole,
         )
         user.encodePassword(passwordEncoder)
         return UserResponse.toResponse(userRepository.save(user))
+    }
+
+    private fun checkRole(role: UserRole): UserRole {
+        return if (role == UserRole.USER) {
+            UserRole.GUEST_BUYER
+        } else {
+            UserRole.GUEST_SELLER
+        }
     }
 
     private fun checkDuplicate(request: JoinRequest) {
@@ -63,6 +75,33 @@ class AuthService(
 
     private fun checkToken(refreshToken: String) {
         require(jwtService.isTokenValid(refreshToken)) { "토큰이 유효하지 않습니다." }
+    }
+
+    fun getAdditionalInfo(email: String): JoinRequest {
+        val noEmailUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        var emailValue = noEmailUser.email
+        if (noEmailUser.email.startsWith("no-kakao-email")) {
+            emailValue = ""
+        }
+        return JoinRequest(
+            email = emailValue,
+            password = noEmailUser.password,
+            nickname = noEmailUser.nickname,
+            role = noEmailUser.userRole,
+        )
+    }
+
+    @Transactional
+    fun updateEmailInfo(joinRequest: JoinRequest, newEmail: String): UserResponse {
+        val oldEmailUser = userRepository.findByEmail(joinRequest.email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        oldEmailUser.updateEmail(newEmail)
+        return UserResponse(oldEmailUser.id)
+    }
+
+    @Transactional
+    fun updateRole(userId: Long) {
+        val user = userRepository.findById(userId).getOrNull() ?: throw IllegalArgumentException()
+        user.updateRole()
     }
 
 }

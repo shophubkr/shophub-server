@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.global.oauth.userInfo
 
+import java.util.UUID
+
 class KakaoOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(attributes) {
 
     override fun getId(): String {
@@ -16,7 +18,10 @@ class KakaoOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(
 
     override fun getEmail(): String {
         val account = attributes["kakao_account"] as Map<*, *>
-        return account["email"] as String
+        val substring = UUID.randomUUID().toString().substring(0, 7)
+        return if (account["email"] == null) {
+            "no-kakao-email-$substring"
+        } else account["email"] as String
     }
 
     override fun getImageUrl(): String {

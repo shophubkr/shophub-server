@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.global.oauth
 
 import kr.co.shophub.shophub.user.model.ProviderType
+import kr.co.shophub.shophub.user.model.UserRole
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 
@@ -9,5 +10,6 @@ class CustomOAuth2User(
     attributes: MutableMap<String, Any>?,
     nameAttributeKey: String?,
     val email: String,
+    val role: UserRole,
     val type: ProviderType,
 ) : DefaultOAuth2User(authorities, attributes, nameAttributeKey)
