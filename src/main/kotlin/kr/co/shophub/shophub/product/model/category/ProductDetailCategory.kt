@@ -15,8 +15,8 @@ class ProductDetailCategory (
     @field:NotNull
     var name: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_category")
-    var productCategory: ProductCategory
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "product_category")
+//    var productCategory: ProductCategory
 ) : BaseEntity(){
 }

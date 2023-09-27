@@ -11,7 +11,7 @@ class ProductCategory(
     @Id
     @Column(name = "product_category")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long,
+    var id: Long = 0L,
 
     @field:NotNull
     var name: String,
@@ -20,7 +20,7 @@ class ProductCategory(
     @JoinColumn(name = "product")
     var product: Product,
 
-    @OneToMany(mappedBy = "productCategory", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val subCategories: MutableList<ProductDetailCategory> = mutableListOf()
+//    @OneToMany(mappedBy = "productCategory", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    val subCategories: MutableList<ProductDetailCategory> = mutableListOf()
 ) : BaseEntity(){
 }

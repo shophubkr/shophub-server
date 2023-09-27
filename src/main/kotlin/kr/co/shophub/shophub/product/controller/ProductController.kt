@@ -3,10 +3,8 @@ package kr.co.shophub.shophub.product.controller
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.dto.PageInfo
-import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.product.dto.*
 import kr.co.shophub.shophub.product.service.ProductService
-import kr.co.shophub.shophub.shop.service.ShopService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -16,8 +14,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/product")
 class ProductController(
     val productService: ProductService,
-    val shopService: ShopService,
-    val loginService: LoginService,
 ) {
 
     @PostMapping("/{shopId}")
@@ -69,46 +65,24 @@ class ProductController(
         )
     }
 
-    /**
-     *
-     * ✔️ 최근 등록 상품 (Object)
-     *     * 상품 idx
-     *     * 대표 이미지
-     *     * 상품명
-     *     * 상품 설명
-     *     * 등록일자(YYYY-MM-DD)
-     *     * 가격
-     */
-
-    /**
-     * - Req 상품 수정
-     *     * 이미지 [ ]
-     *     * 상품 소개
-     *     * 가격
-     *     * 상품 태그 [ ]
-     *     * 판매여부(판매중 | 판매안함)
-     */
     @PutMapping("/{productId}")
-    fun changeProduct(
+    fun updateProduct(
         @PathVariable productId: Long,
-        updateProductRequest: UpdateProductRequest,
+        @RequestBody updateProductRequest: UpdateProductRequest,
     ): CommonResponse<ProductIdResponse> {
 
-        return productService.changeProduct(
+        return productService.updateProduct(
             productId = productId,
             updateProductRequest = updateProductRequest
         ).let { CommonResponse(it) }
     }
 
-    /**
-     * - Req 상품 삭제
-     */
     @DeleteMapping("/{productId}")
     fun deleteProduct(
-        @PathVariable productId: String
+        @PathVariable productId: Long
     ) : CommonResponse<EmptyDto> {
 
-        productService.deleteProduct(
+        productService.softDelete(
             productId = productId
         )
         return CommonResponse.EMPTY
