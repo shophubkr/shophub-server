@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.global.s3
+package kr.co.shophub.shophub.global.file
 
 enum class FileExtension(val extension: String) {
     JPG("jpg"),
