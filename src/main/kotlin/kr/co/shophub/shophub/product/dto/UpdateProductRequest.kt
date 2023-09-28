@@ -9,6 +9,7 @@ data class UpdateProductRequest(
     val images: List<String>,
     val tags: List<String>,
     val status: ProductStatus,
+    val category: String,
 ){
 
 }

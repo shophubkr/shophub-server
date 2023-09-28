@@ -6,10 +6,10 @@ data class CreateProductRequest(
     val name: String,
     val price: Int,
     val introduce: String,
-    val images: List<String>,
     val tags: List<String>,
+    val images: List<String>,
     val status: ProductStatus,
-    val category: String
+    val category: String,
 ){
 
 }

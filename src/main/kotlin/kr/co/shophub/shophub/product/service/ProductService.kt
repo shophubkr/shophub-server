@@ -1,6 +1,9 @@
 package kr.co.shophub.shophub.product.service
 
-import kr.co.shophub.shophub.product.dto.*
+import kr.co.shophub.shophub.product.dto.CreateProductRequest
+import kr.co.shophub.shophub.product.dto.ProductIdResponse
+import kr.co.shophub.shophub.product.dto.ProductResponse
+import kr.co.shophub.shophub.product.dto.UpdateProductRequest
 import kr.co.shophub.shophub.product.model.category.ProductCategory
 import kr.co.shophub.shophub.product.model.image.ProductImage
 import kr.co.shophub.shophub.product.model.product.Product
@@ -31,21 +34,43 @@ class ProductService(
 
         val savedProduct = productRepository.save(product)
 
-        val productImages = createProductRequest.images.map { imageUrl ->
-            ProductImage(imgUrl = imageUrl, product = savedProduct)
-        }
-        productImageRepository.saveAll(productImages)
+        saveImage(createProductRequest, savedProduct)
+        saveTag(createProductRequest, savedProduct)
+        saveCategory(createProductRequest, savedProduct)
 
+        return ProductIdResponse(savedProduct.id)
+    }
+
+    private fun saveCategory(
+        createProductRequest: CreateProductRequest,
+        product: Product
+    ) {
+        productCategoryRepository.save(
+            ProductCategory(
+                name = createProductRequest.category,
+                product = product,
+            )
+        )
+    }
+
+    private fun saveTag(
+        createProductRequest: CreateProductRequest,
+        product: Product
+    ) {
         val productTags = createProductRequest.tags.map { tag ->
             ProductTag(tag = tag, product = product)
         }
         productTagRepository.saveAll(productTags)
+    }
 
-        productCategoryRepository.save(ProductCategory(
-            name = createProductRequest.category,
-            product = product,
-        ))
-        return ProductIdResponse(savedProduct.id)
+    private fun saveImage(
+        createProductRequest: CreateProductRequest,
+        savedProduct: Product
+    ) {
+        val productImages = createProductRequest.images.map { imageUrl ->
+            ProductImage(imgUrl = imageUrl, product = savedProduct)
+        }
+        productImageRepository.saveAll(productImages)
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
@@ -67,21 +92,43 @@ class ProductService(
         val product = findProduct(productId)
         product.updateInfo(updateProductRequest)
 
-        productImageRepository.deleteAll(product.images)
-        productTagRepository.deleteAll(product.tags)
-
-        product.images.clear()
-        product.tags.clear()
-
-        val newImages = updateProductRequest.images.map { ProductImage(imgUrl = it, product = product) }
-        val newTags = updateProductRequest.tags.map { ProductTag(tag = it, product = product) }
-
-        product.images.addAll(newImages)
-        product.tags.addAll(newTags)
-
-        productRepository.save(product)
+        updateImage(product, updateProductRequest)
+        updateTag(product, updateProductRequest)
+        updateCategory(product, updateProductRequest)
 
         return ProductIdResponse(productId)
+    }
+
+    private fun updateCategory(
+        product: Product,
+        updateProductRequest: UpdateProductRequest
+    ) {
+        product.category?.let { category ->
+            category.name = updateProductRequest.category
+        } ?: run {
+            val newCategory = ProductCategory(name = updateProductRequest.category, product = product)
+            product.category = newCategory
+        }
+    }
+
+    private fun updateImage(
+        product: Product,
+        updateProductRequest: UpdateProductRequest
+    ) {
+        productImageRepository.deleteAll(product.images)
+        product.images.clear()
+        val newImages = updateProductRequest.images.map { ProductImage(imgUrl = it, product = product) }
+        product.images.addAll(newImages)
+    }
+
+    private fun updateTag(
+        product: Product,
+        updateProductRequest: UpdateProductRequest
+    ) {
+        productTagRepository.deleteAll(product.tags)
+        product.tags.clear()
+        val newTags = updateProductRequest.tags.map { ProductTag(tag = it, product = product) }
+        product.tags.addAll(newTags)
     }
 
     @Transactional
