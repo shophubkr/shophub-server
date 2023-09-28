@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.product.service
 
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.product.dto.CreateProductRequest
 import kr.co.shophub.shophub.product.dto.ProductIdResponse
 import kr.co.shophub.shophub.product.dto.ProductResponse
@@ -13,6 +14,7 @@ import kr.co.shophub.shophub.product.repository.ProductImageRepository
 import kr.co.shophub.shophub.product.repository.ProductRepository
 import kr.co.shophub.shophub.product.repository.ProductTagRepository
 import kr.co.shophub.shophub.shop.repository.ShopRepository
+import kr.co.shophub.shophub.shop.service.ShopService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -29,6 +31,8 @@ class ProductService(
 
     @Transactional
     fun createProduct(shopId: Long, createProductRequest: CreateProductRequest): ProductIdResponse {
+        validateShopRequest(createProductRequest.images.size, createProductRequest.tags.size)
+
         val shop = findShop(shopId)
         val product = Product(createProductRequest, shop)
 
@@ -89,6 +93,8 @@ class ProductService(
 
     @Transactional
     fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductIdResponse {
+        validateShopRequest(updateProductRequest.images.size, updateProductRequest.tags.size)
+
         val product = findProduct(productId)
         product.updateInfo(updateProductRequest)
 
@@ -137,6 +143,19 @@ class ProductService(
         product.softDelete()
     }
 
+    private fun validateShopRequest(imageSize: Int, tagSize: Int) {
+        require(imageSize >= ProductService.MIN_IMAGE_COUNT) { "이미지 최소 갯수는 ${ProductService.MIN_IMAGE_COUNT} 개 입니다." }
+        require(imageSize <= ProductService.MAX_IMAGE_COUNT) { "이미지 최대 갯수는 ${ProductService.MAX_IMAGE_COUNT} 개 입니다." }
+        require(tagSize <= ProductService.MAX_TAG_COUNT) { "태그 최대 갯수는 ${ProductService.MAX_TAG_COUNT} 개 입니다." }
+    }
+
     private fun findProduct(productId: Long) = productRepository.findByIdAndDeletedIsFalse(productId)
+        ?: throw ResourceNotFoundException("존재하지 않는 상품입니다.")
+
+    companion object {
+        private const val MIN_IMAGE_COUNT = 3
+        private const val MAX_IMAGE_COUNT = 10
+        private const val MAX_TAG_COUNT = 5
+    }
 }
 
