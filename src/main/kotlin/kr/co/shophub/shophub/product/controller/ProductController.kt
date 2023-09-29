@@ -28,19 +28,6 @@ class ProductController(
         ).let { CommonResponse(it) }
     }
 
-    /**
-     * - Res 상품 조회
-     *     * total
-     *     * 등록 상품 [ ]
-     *     * 페이지네이션
-     *
-     * ✔️ 등록 상품(Object)
-     *     * idx
-     *     * 대표 이미지
-     *     * 1차 카테고리
-     *     * 상품 소개
-     *     * 가격
-     */
     @GetMapping("/{productId}")
     fun getOneProduct(
         @PathVariable productId: Long,
