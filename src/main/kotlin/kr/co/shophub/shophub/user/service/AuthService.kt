@@ -1,9 +1,7 @@
 package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.global.jwt.service.JwtService
-import kr.co.shophub.shophub.user.dto.JoinRequest
-import kr.co.shophub.shophub.user.dto.TokenResponse
-import kr.co.shophub.shophub.user.dto.UserResponse
+import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
@@ -25,7 +23,6 @@ class AuthService(
 
     @Transactional
     fun join(request: JoinRequest): UserResponse {
-        checkDuplicate(request)
         val userRole = checkRole(request.role)
         val user = User(
             email = request.email,
@@ -33,6 +30,7 @@ class AuthService(
             nickname = request.nickname,
             userRole = userRole,
         )
+        checkDuplicate(user)
         user.encodePassword(passwordEncoder)
         return UserResponse.toResponse(userRepository.save(user))
     }
@@ -45,11 +43,11 @@ class AuthService(
         }
     }
 
-    private fun checkDuplicate(request: JoinRequest) {
-        if (userRepository.existsByEmail(request.email)) {
+    private fun checkDuplicate(user: User) {
+        if (userRepository.existsByEmail(user.email)) {
             throw IllegalStateException("이미 가입한 이메일 입니다.")
         }
-        if (userRepository.existsByNickname(request.nickname)) {
+        if (userRepository.existsByNickname(user.nickname)) {
             throw IllegalStateException("이미 가입한 닉네임 입니다.")
         }
     }
@@ -69,7 +67,9 @@ class AuthService(
     }
 
     @Transactional
-    fun issueTokenOfOAuth(email: String): TokenResponse {
+    fun issueTokenOfOAuth(token: String): TokenResponse {
+        checkToken(token)
+        val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
         return jwtService.makeTokenResponse(email)
     }
 
@@ -77,24 +77,33 @@ class AuthService(
         require(jwtService.isTokenValid(refreshToken)) { "토큰이 유효하지 않습니다." }
     }
 
-    fun getAdditionalInfo(email: String): JoinRequest {
-        val noEmailUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
-        var emailValue = noEmailUser.email
-        if (noEmailUser.email.startsWith("no-kakao-email")) {
-            emailValue = ""
-        }
-        return JoinRequest(
+    fun getAdditionalInfo(token: String): SocialJoinResponse {
+        checkToken(token)
+        val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
+        val socialUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        checkDuplicate(socialUser)
+        val emailValue = getEmailValue(socialUser)
+        return SocialJoinResponse(
             email = emailValue,
-            password = noEmailUser.password,
-            nickname = noEmailUser.nickname,
-            role = noEmailUser.userRole,
+            password = socialUser.password,
+            nickname = socialUser.nickname,
         )
     }
 
+    private fun getEmailValue(user: User): String {
+        val email = user.email
+        return if (email.startsWith("no-kakao-email")) {
+            ""
+        } else {
+            email
+        }
+    }
+
     @Transactional
-    fun updateEmailInfo(joinRequest: JoinRequest, newEmail: String): UserResponse {
-        val oldEmailUser = userRepository.findByEmail(joinRequest.email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
-        oldEmailUser.updateEmail(newEmail)
+    fun updateEmailInfo(socialJoinRequest: SocialJoinRequest): UserResponse {
+        val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        oldEmailUser.updateEmail(socialJoinRequest)
+        checkDuplicate(oldEmailUser)
         return UserResponse(oldEmailUser.id)
     }
 

@@ -1,11 +1,7 @@
 package kr.co.shophub.shophub.user.controller
 
 import kr.co.shophub.shophub.global.dto.CommonResponse
-import kr.co.shophub.shophub.user.dto.JoinRequest
-import kr.co.shophub.shophub.user.dto.LoginRequest
-import kr.co.shophub.shophub.user.dto.TokenRequest
-import kr.co.shophub.shophub.user.dto.TokenResponse
-import kr.co.shophub.shophub.user.dto.UserResponse
+import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.service.AuthService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -38,9 +34,9 @@ class AuthController(
         return CommonResponse(authService.reIssueToken(tokenRequest.refreshToken))
     }
 
-    @GetMapping("/token")
-    fun issueTokenOfOAuthUser(@RequestParam email: String): CommonResponse<TokenResponse> {
-        val tokenResponse: TokenResponse = authService.issueTokenOfOAuth(email)
+    @GetMapping("/issue")
+    fun issueTokenOfOAuthUser(@RequestParam token: String): CommonResponse<TokenResponse> {
+        val tokenResponse: TokenResponse = authService.issueTokenOfOAuth(token)
         return CommonResponse(tokenResponse)
     }
 
@@ -50,13 +46,13 @@ class AuthController(
      * 회원가입을 완료한다.
      */
     @GetMapping("/add-info")
-    fun getAdditionalInfo(@RequestParam email: String): CommonResponse<JoinRequest> {
-        return CommonResponse(authService.getAdditionalInfo(email))
+    fun getAdditionalInfo(@RequestParam token: String): CommonResponse<SocialJoinResponse> {
+        return CommonResponse(authService.getAdditionalInfo(token))
     }
 
     @PostMapping("/add-info")
-    fun updateEmailInfo(@RequestParam email: String, @RequestBody joinRequest: JoinRequest): CommonResponse<UserResponse> {
-        return CommonResponse(authService.updateEmailInfo(joinRequest, email))
+    fun updateEmailInfo(@RequestBody joinRequest: SocialJoinRequest): CommonResponse<UserResponse> {
+        return CommonResponse(authService.updateEmailInfo(joinRequest))
     }
 
     /**

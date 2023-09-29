@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.global.oauth.handler
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
+import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.global.oauth.CustomOAuth2User
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class OAuth2LoginSuccessHandler(
     private val userRepository: UserRepository,
+    private val jwtService: JwtService,
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -25,12 +27,15 @@ class OAuth2LoginSuccessHandler(
     ) {
 
         val oAuth2User = authentication.principal as CustomOAuth2User
-        val user = userRepository.findByEmail(oAuth2User.email) ?: throw ResourceNotFoundException("")
+        val user = userRepository.findByEmail(oAuth2User.email) ?: throw ResourceNotFoundException("해당 유저를 찾을 수 없습니다.")
+        val tokenForOAuth2 = jwtService.createTokenForOAuth2(oAuth2User.email)
 
         if (isSignUp(user)) {
-            response.sendRedirect("/api/v1/auth/add-info?email=${user.email}")
-        } else if (isAlreadyJoin(user)) {
-            response.sendRedirect("/api/v1/auth/token?email=${user.email}")
+            response.sendRedirect("/api/v1/auth/add-info?token=$tokenForOAuth2")
+        }
+
+        if (isAlreadyJoin(user)) {
+            response.sendRedirect("/api/v1/auth/issue?token=$tokenForOAuth2")
         }
     }
 

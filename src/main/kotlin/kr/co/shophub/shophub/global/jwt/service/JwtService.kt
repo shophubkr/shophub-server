@@ -39,9 +39,11 @@ class JwtService(
     companion object {
         const val ACCESS_TOKEN_SUBJECT: String = "AccessToken"
         const val REFRESH_TOKEN_SUBJECT: String = "RefreshToken"
+        const val SIGN_UP_SUBJECT: String = "SignUp"
         const val EMAIL_CLAIM: String = "email"
         const val BEARER: String = "Bearer "
         const val JWT_TOKEN: String = "Authorization"
+        const val SIGN_UP_TIMEOUT = 60000L
 
         private val logger = LoggerFactory.getLogger(JwtService::class.java)
     }
@@ -71,6 +73,15 @@ class JwtService(
             .sign(Algorithm.HMAC512(secretKey))
     }
 
+    fun createTokenForOAuth2(email: String): String {
+        val now = Date()
+        return JWT.create()
+            .withSubject(SIGN_UP_SUBJECT)
+            .withExpiresAt(Date(now.time + SIGN_UP_TIMEOUT))
+            .withClaim(EMAIL_CLAIM, email)
+            .sign(Algorithm.HMAC512(secretKey))
+    }
+
     fun extractToken(request: HttpServletRequest): String? {
         val header = request.getHeader(JWT_TOKEN) ?: return null
         return if (header.startsWith(BEARER)) {
@@ -90,11 +101,11 @@ class JwtService(
         } else null
     }
 
-    private fun extractEmail(accessToken: String?): String? {
+    fun extractEmail(token: String?): String? {
         return try {
             JWT.require(Algorithm.HMAC512(secretKey))
                 .build()
-                .verify(accessToken)
+                .verify(token)
                 .getClaim(EMAIL_CLAIM)
                 .asString()
         } catch (e: Exception) {

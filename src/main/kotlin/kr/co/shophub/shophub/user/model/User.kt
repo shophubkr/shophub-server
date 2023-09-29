@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.user.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
+import kr.co.shophub.shophub.user.dto.SocialJoinRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
@@ -18,7 +19,7 @@ class User(
     var password: String,
 
     @field:NotNull
-    val nickname: String,
+    var nickname: String,
 
     var refreshToken: String = "empty",
     val providerId: String = "only-social",
@@ -42,8 +43,12 @@ class User(
         this.refreshToken = updateRefreshToken
     }
 
-    fun updateEmail(newEmail: String) {
-        this.email = newEmail
+    fun updateEmail(request: SocialJoinRequest) {
+        this.email = request.newEmail
+        this.userRole = request.role
+        this.updateRole()
+        this.nickname = request.nickname
+        this.password = request.password
     }
 
     fun updateRole() {
