@@ -4,7 +4,7 @@ import kr.co.shophub.shophub.product.model.product.ProductStatus
 
 data class UpdateProductRequest(
     val name: String,
-    val price: String,
+    val price: Int,
     val introduce: String,
     val images: List<String>,
     val tags: List<String>,

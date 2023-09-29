@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.product.model.product
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.PositiveOrZero
 import kr.co.shophub.shophub.global.model.BaseEntity
@@ -18,7 +19,7 @@ class Product(
     @Column(name = "product_id")
     var id: Long = 0L,
 
-    @field:NotNull
+    @field:NotNull @NotEmpty
     var name: String,
 
     @field:NotNull
@@ -57,7 +58,7 @@ class Product(
 
     fun updateInfo(updateProductRequest: UpdateProductRequest) {
         name = updateProductRequest.name
-        price = Integer.parseInt(updateProductRequest.price)
+        price = updateProductRequest.price
         introduce = updateProductRequest.introduce
         status = updateProductRequest.status
     }

@@ -14,7 +14,6 @@ import kr.co.shophub.shophub.product.repository.ProductImageRepository
 import kr.co.shophub.shophub.product.repository.ProductRepository
 import kr.co.shophub.shophub.product.repository.ProductTagRepository
 import kr.co.shophub.shophub.shop.repository.ShopRepository
-import kr.co.shophub.shophub.shop.service.ShopService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -31,7 +30,7 @@ class ProductService(
 
     @Transactional
     fun createProduct(shopId: Long, createProductRequest: CreateProductRequest): ProductIdResponse {
-        validateShopRequest(createProductRequest.images.size, createProductRequest.tags.size)
+        validateProductRequest(createProductRequest.images.size, createProductRequest.tags.size)
 
         val shop = findShop(shopId)
         val product = Product(createProductRequest, shop)
@@ -78,7 +77,7 @@ class ProductService(
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
-        ?: throw IllegalArgumentException("상품에 대한 매장 정보를 찾을 수 없습니다."))
+        ?: throw IllegalArgumentException("매장 정보를 찾을 수 없습니다."))
 
     @Transactional(readOnly = true)
     fun getProduct(productId: Long): ProductResponse {
@@ -93,7 +92,7 @@ class ProductService(
 
     @Transactional
     fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductIdResponse {
-        validateShopRequest(updateProductRequest.images.size, updateProductRequest.tags.size)
+        validateProductRequest(updateProductRequest.images.size, updateProductRequest.tags.size)
 
         val product = findProduct(productId)
         product.updateInfo(updateProductRequest)
@@ -143,10 +142,10 @@ class ProductService(
         product.softDelete()
     }
 
-    private fun validateShopRequest(imageSize: Int, tagSize: Int) {
-        require(imageSize >= ProductService.MIN_IMAGE_COUNT) { "이미지 최소 갯수는 ${ProductService.MIN_IMAGE_COUNT} 개 입니다." }
-        require(imageSize <= ProductService.MAX_IMAGE_COUNT) { "이미지 최대 갯수는 ${ProductService.MAX_IMAGE_COUNT} 개 입니다." }
-        require(tagSize <= ProductService.MAX_TAG_COUNT) { "태그 최대 갯수는 ${ProductService.MAX_TAG_COUNT} 개 입니다." }
+    private fun validateProductRequest(imageSize: Int, tagSize: Int) {
+        require(imageSize >= MIN_IMAGE_COUNT) { "이미지 최소 갯수는 $MIN_IMAGE_COUNT 개 입니다." }
+        require(imageSize <= MAX_IMAGE_COUNT) { "이미지 최대 갯수는 $MAX_IMAGE_COUNT 개 입니다." }
+        require(tagSize <= MAX_TAG_COUNT) { "태그 최대 갯수는 $MAX_TAG_COUNT 개 입니다." }
     }
 
     private fun findProduct(productId: Long) = productRepository.findByIdAndDeletedIsFalse(productId)
