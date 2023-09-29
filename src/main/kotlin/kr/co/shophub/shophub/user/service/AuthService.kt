@@ -82,22 +82,13 @@ class AuthService(
         val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
         val socialUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
         checkDuplicate(socialUser)
-        val emailValue = getEmailValue(socialUser)
         return SocialJoinResponse(
-            email = emailValue,
+            email = socialUser.email,
             password = socialUser.password,
             nickname = socialUser.nickname,
         )
     }
 
-    private fun getEmailValue(user: User): String {
-        val email = user.email
-        return if (email.startsWith("no-kakao-email")) {
-            ""
-        } else {
-            email
-        }
-    }
 
     @Transactional
     fun updateEmailInfo(socialJoinRequest: SocialJoinRequest): UserResponse {
