@@ -13,7 +13,8 @@ interface ProductRepository : JpaRepository<Product, Long>{
             "FROM Product p " +
             "JOIN FETCH p.images " +
             "JOIN FETCH p.category " +
+            "JOIN FETCH p.shop " +
             "WHERE p.id = :productId AND p.deleted = false")
     fun findByIdAndDeletedIsFalse(productId: Long): Product?
-    fun findAllByDeletedIsFalse(pageable: Pageable): Page<Product>
+    fun findAllByShopIdAndDeletedIsFalse(shopId: Long, pageable: Pageable): Page<Product>
 }

@@ -13,6 +13,7 @@ import kr.co.shophub.shophub.product.repository.ProductCategoryRepository
 import kr.co.shophub.shophub.product.repository.ProductImageRepository
 import kr.co.shophub.shophub.product.repository.ProductRepository
 import kr.co.shophub.shophub.product.repository.ProductTagRepository
+import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -29,10 +30,11 @@ class ProductService(
     ) {
 
     @Transactional
-    fun createProduct(shopId: Long, createProductRequest: CreateProductRequest): ProductIdResponse {
-        validateProductRequest(createProductRequest.images.size, createProductRequest.tags.size)
-
+    fun createProduct(loginUserId: Long, shopId: Long, createProductRequest: CreateProductRequest,): ProductIdResponse {
         val shop = findShop(shopId)
+        validateProductRequest(createProductRequest.images.size, createProductRequest.tags.size)
+        isOwnerOfShop(shop, loginUserId)
+
         val product = Product(createProductRequest, shop)
 
         val savedProduct = productRepository.save(product)
@@ -44,16 +46,15 @@ class ProductService(
         return ProductIdResponse(savedProduct.id)
     }
 
-    private fun saveCategory(
+    private fun saveImage(
         createProductRequest: CreateProductRequest,
         product: Product
     ) {
-        productCategoryRepository.save(
-            ProductCategory(
-                name = createProductRequest.category,
-                product = product,
-            )
-        )
+        val productImages = createProductRequest.images.map { imageUrl ->
+            ProductImage(imgUrl = imageUrl, product = product)
+        }
+        productImageRepository.saveAll(productImages)
+        product.images.addAll(productImages)
     }
 
     private fun saveTag(
@@ -64,16 +65,19 @@ class ProductService(
             ProductTag(tag = tag, product = product)
         }
         productTagRepository.saveAll(productTags)
+        product.tags.addAll(productTags)
     }
 
-    private fun saveImage(
+    private fun saveCategory(
         createProductRequest: CreateProductRequest,
-        savedProduct: Product
+        product: Product
     ) {
-        val productImages = createProductRequest.images.map { imageUrl ->
-            ProductImage(imgUrl = imageUrl, product = savedProduct)
-        }
-        productImageRepository.saveAll(productImages)
+        val productCategory = ProductCategory(
+            name = createProductRequest.category,
+            product = product,
+        )
+        productCategoryRepository.save(productCategory)
+        product.category = productCategory
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
@@ -86,15 +90,17 @@ class ProductService(
     }
 
     @Transactional(readOnly = true)
-    fun getProductList(pageable: Pageable): Page<Product> {
-        return productRepository.findAllByDeletedIsFalse(pageable)
+    fun getProductList(shopId: Long, pageable: Pageable): Page<Product> {
+        return productRepository.findAllByShopIdAndDeletedIsFalse(shopId, pageable)
     }
 
     @Transactional
-    fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductIdResponse {
-        validateProductRequest(updateProductRequest.images.size, updateProductRequest.tags.size)
-
+    fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest, loginUserId: Long): ProductIdResponse {
         val product = findProduct(productId)
+
+        validateProductRequest(updateProductRequest.images.size, updateProductRequest.tags.size)
+        isOwnerOfShop(product.shop, loginUserId)
+
         product.updateInfo(updateProductRequest)
 
         updateImage(product, updateProductRequest)
@@ -137,8 +143,9 @@ class ProductService(
     }
 
     @Transactional
-    fun softDelete(productId: Long) {
+    fun softDelete(productId: Long, loginUserId: Long) {
         val product = findProduct(productId)
+        isOwnerOfShop(product.shop, loginUserId)
         product.softDelete()
     }
 
@@ -146,6 +153,10 @@ class ProductService(
         require(imageSize >= MIN_IMAGE_COUNT) { "이미지 최소 갯수는 $MIN_IMAGE_COUNT 개 입니다." }
         require(imageSize <= MAX_IMAGE_COUNT) { "이미지 최대 갯수는 $MAX_IMAGE_COUNT 개 입니다." }
         require(tagSize <= MAX_TAG_COUNT) { "태그 최대 갯수는 $MAX_TAG_COUNT 개 입니다." }
+    }
+
+    private fun isOwnerOfShop(shop: Shop, loginUserId: Long) {
+        check(shop.sellerId == loginUserId) { "매장에 대한 권한이 없습니다." }
     }
 
     private fun findProduct(productId: Long) = productRepository.findByIdAndDeletedIsFalse(productId)

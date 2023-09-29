@@ -76,6 +76,7 @@ class ProductServiceTest : BehaviorSpec({
         category = "Sample Category"
     )
 
+    val loginUserId = 1L
 
     Given("가게와 상품 생성 요청이 주어졌을 때") {
         every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
@@ -86,7 +87,7 @@ class ProductServiceTest : BehaviorSpec({
 
 
         When("상품을 생성하려고 할 때") {
-            val response = productService.createProduct(shopId, createProductRequest)
+            val response = productService.createProduct(loginUserId, shopId, createProductRequest)
 
             Then("새로운 상품 ID가 반환되어야 한다.") {
                 response shouldBe ProductIdResponse(productId)
@@ -102,7 +103,7 @@ class ProductServiceTest : BehaviorSpec({
                 images = listOf("Image1.jpg", "Image2.jpg")
             )
             val exception = shouldThrow<IllegalArgumentException> {
-                productService.createProduct(shopId, invalidRequest)
+                productService.createProduct(loginUserId, shopId, invalidRequest,)
             }
 
             Then("예외가 발생해야 한다") {
@@ -117,7 +118,7 @@ class ProductServiceTest : BehaviorSpec({
                 images = list
             )
             val exception = shouldThrow<IllegalArgumentException> {
-                productService.createProduct(shopId, invalidRequest)
+                productService.createProduct(loginUserId, shopId, invalidRequest,)
             }
 
             Then("예외가 발생해야 한다") {
@@ -132,7 +133,7 @@ class ProductServiceTest : BehaviorSpec({
                 tags = list
             )
             val exception = shouldThrow<IllegalArgumentException> {
-                productService.createProduct(shopId, invalidRequest)
+                productService.createProduct(loginUserId, shopId, invalidRequest,)
             }
 
             Then("예외가 발생해야 한다") {
@@ -146,7 +147,7 @@ class ProductServiceTest : BehaviorSpec({
 
         When("상품을 생성하려고 시도할 때") {
             val exception = shouldThrow<IllegalArgumentException> {
-                productService.createProduct(notShopId, createProductRequest)
+                productService.createProduct(loginUserId, notShopId, createProductRequest,)
             }
 
             Then("예외가 발생해야 한다") {
@@ -161,7 +162,7 @@ class ProductServiceTest : BehaviorSpec({
         every { productTagRepository.deleteAll(any<List<ProductTag>>()) } returns Unit
 
         When("제품을 업데이트하면") {
-            val response = productService.updateProduct(productId, updateProductRequest)
+            val response = productService.updateProduct(productId, updateProductRequest, loginUserId)
 
             Then("동일한 제품 ID가 반환된다") {
                 response shouldBe ProductIdResponse(productId)
@@ -175,7 +176,7 @@ class ProductServiceTest : BehaviorSpec({
         every { productRepository.findByIdAndDeletedIsFalse(productId) } returns product
 
         When("제품을 삭제하면") {
-            productService.softDelete(productId)
+            productService.softDelete(productId, loginUserId)
 
             Then("제품이 삭제로 표시된다") {
                 verify { productRepository.findByIdAndDeletedIsFalse(productId) }
