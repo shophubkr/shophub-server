@@ -44,9 +44,6 @@ class AuthService(
     }
 
     private fun checkDuplicate(user: User) {
-        if (user.userRole == UserRole.GUEST_BUYER || user.userRole == UserRole.GUEST_SELLER) {
-            return
-        }
         if (userRepository.existsByEmail(user.email)) {
             throw IllegalStateException("이미 가입한 이메일 입니다.")
         }
@@ -84,13 +81,25 @@ class AuthService(
         checkToken(token)
         val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
         val socialUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
-        checkDuplicate(socialUser)
+        checkOAuthDuplicate(socialUser)
         return SocialJoinResponse(
             email = socialUser.email,
             password = socialUser.password,
             nickname = socialUser.nickname,
         )
     }
+
+    private fun checkOAuthDuplicate(user: User) {
+        if (isAuthenticated(user) && userRepository.existsByEmail(user.email)) {
+            throw IllegalStateException("이미 가입한 이메일 입니다.")
+        }
+        if (isAuthenticated(user) && userRepository.existsByNickname(user.nickname)) {
+            throw IllegalStateException("이미 가입한 닉네임 입니다.")
+        }
+    }
+
+    private fun isAuthenticated(user: User) =
+        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER
 
 
     @Transactional

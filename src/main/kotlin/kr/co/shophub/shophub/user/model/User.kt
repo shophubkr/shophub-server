@@ -54,7 +54,8 @@ class User(
     fun updateRole() {
         if (this.userRole == UserRole.GUEST_BUYER) {
             this.userRole = UserRole.USER
-        } else {
+        }
+        if (this.userRole == UserRole.GUEST_SELLER) {
             this.userRole = UserRole.SELLER
         }
     }
