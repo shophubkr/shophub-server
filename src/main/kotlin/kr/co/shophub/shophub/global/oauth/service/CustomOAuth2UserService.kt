@@ -11,9 +11,11 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
+@Transactional
 class CustomOAuth2UserService(
     private val userRepository: UserRepository,
 ) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -59,6 +61,14 @@ class CustomOAuth2UserService(
     }
 
     private fun getUser(attributes: OAuthAttributes, socialType: ProviderType): User {
+
+        val email = attributes.oAuth2UserInfo.getEmail()
+        val user = userRepository.findByEmail(email)
+        if (user != null && user.providerType == ProviderType.NO_SOCIAL) {
+            user.mergeInfo(attributes, socialType)
+            return user
+        }
+
         return userRepository.findByProviderTypeAndProviderId(
             socialType,
             attributes.oAuth2UserInfo.getId()
