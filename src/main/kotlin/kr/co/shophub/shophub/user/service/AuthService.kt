@@ -44,6 +44,9 @@ class AuthService(
     }
 
     private fun checkDuplicate(user: User) {
+        if (user.userRole == UserRole.GUEST_BUYER || user.userRole == UserRole.GUEST_SELLER) {
+            return
+        }
         if (userRepository.existsByEmail(user.email)) {
             throw IllegalStateException("이미 가입한 이메일 입니다.")
         }
