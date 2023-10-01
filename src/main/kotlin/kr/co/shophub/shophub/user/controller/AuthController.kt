@@ -52,7 +52,7 @@ class AuthController(
 
     @PostMapping("/add-info")
     fun updateEmailInfo(@RequestBody joinRequest: SocialJoinRequest): CommonResponse<UserResponse> {
-        return CommonResponse(authService.updateEmailInfo(joinRequest))
+        return CommonResponse(authService.updateSocialInfo(joinRequest))
     }
 
     /**

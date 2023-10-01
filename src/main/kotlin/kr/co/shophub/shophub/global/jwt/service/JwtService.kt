@@ -43,7 +43,7 @@ class JwtService(
         const val EMAIL_CLAIM: String = "email"
         const val BEARER: String = "Bearer "
         const val JWT_TOKEN: String = "Authorization"
-        const val SIGN_UP_TIMEOUT = 60000L
+        const val TEN_MINUTE = 60000L
 
         private val logger = LoggerFactory.getLogger(JwtService::class.java)
     }
@@ -77,7 +77,7 @@ class JwtService(
         val now = Date()
         return JWT.create()
             .withSubject(SIGN_UP_SUBJECT)
-            .withExpiresAt(Date(now.time + SIGN_UP_TIMEOUT))
+            .withExpiresAt(Date(now.time + TEN_MINUTE))
             .withClaim(EMAIL_CLAIM, email)
             .sign(Algorithm.HMAC512(secretKey))
     }

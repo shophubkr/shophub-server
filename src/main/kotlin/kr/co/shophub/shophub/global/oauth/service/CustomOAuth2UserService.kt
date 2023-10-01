@@ -60,23 +60,23 @@ class CustomOAuth2UserService(
         }
     }
 
-    private fun getUser(attributes: OAuthAttributes, socialType: ProviderType): User {
+    private fun getUser(attributes: OAuthAttributes, providerType: ProviderType): User {
 
         val email = attributes.oAuth2UserInfo.getEmail()
         val user = userRepository.findByEmail(email)
         if (user != null && user.providerType == ProviderType.NO_SOCIAL) {
-            user.mergeInfo(attributes, socialType)
+            user.mergeInfo(attributes, providerType)
             return user
         }
 
         return userRepository.findByProviderTypeAndProviderId(
-            socialType,
+            providerType,
             attributes.oAuth2UserInfo.getId()
-        ) ?: return saveUser(attributes, socialType)
+        ) ?: return saveUser(attributes, providerType)
     }
 
-    private fun saveUser(attributes: OAuthAttributes, socialType: ProviderType): User {
-        val createUser = attributes.toEntity(socialType, attributes.oAuth2UserInfo)
+    private fun saveUser(attributes: OAuthAttributes, providerType: ProviderType): User {
+        val createUser = attributes.toEntity(providerType, attributes.oAuth2UserInfo)
         return userRepository.save(createUser)
     }
 

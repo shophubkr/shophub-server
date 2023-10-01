@@ -44,10 +44,9 @@ class User(
         this.refreshToken = updateRefreshToken
     }
 
-    fun updateEmail(request: SocialJoinRequest) {
+    fun updateSocialInfo(request: SocialJoinRequest, checkRole: UserRole) {
         this.email = request.newEmail
-        this.userRole = request.role
-        this.updateRole()
+        this.userRole = checkRole
         this.nickname = request.nickname
         this.password = request.password
     }
