@@ -11,7 +11,7 @@ data class ProductResponse(
 ) {
     constructor(product: Product) : this(
         id = product.id,
-        imageUrl = product.images[0].imgUrl,
+        imageUrl = product.getFirstImageUrl(),
         topCategory = product.category!!.name,
         introduce = product.introduce,
         price = product.price,

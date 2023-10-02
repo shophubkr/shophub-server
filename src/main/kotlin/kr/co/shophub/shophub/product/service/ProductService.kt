@@ -1,10 +1,7 @@
 package kr.co.shophub.shophub.product.service
 
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
-import kr.co.shophub.shophub.product.dto.CreateProductRequest
-import kr.co.shophub.shophub.product.dto.ProductIdResponse
-import kr.co.shophub.shophub.product.dto.ProductResponse
-import kr.co.shophub.shophub.product.dto.UpdateProductRequest
+import kr.co.shophub.shophub.product.dto.*
 import kr.co.shophub.shophub.product.model.category.ProductCategory
 import kr.co.shophub.shophub.product.model.image.ProductImage
 import kr.co.shophub.shophub.product.model.product.Product
@@ -87,6 +84,16 @@ class ProductService(
     fun getProduct(productId: Long): ProductResponse {
         val product = findProduct(productId)
         return ProductResponse(product)
+    }
+
+    @Transactional(readOnly = true)
+    fun getProductImages(productId: Long): ProductImagesResponse {
+        val product = findProduct(productId)
+        val imageUrlList: MutableList<String> = mutableListOf()
+        for (image in product.images) {
+            imageUrlList.add(image.imgUrl)
+        }
+        return ProductImagesResponse(imageUrlList)
     }
 
     @Transactional(readOnly = true)

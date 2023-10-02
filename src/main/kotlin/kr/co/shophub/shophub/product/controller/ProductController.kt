@@ -43,6 +43,18 @@ class ProductController(
         }
     }
 
+    @GetMapping("/products/{productId}/images")
+    fun getProductImages(
+        @PathVariable productId: Long,
+    ): CommonResponse<ProductImagesResponse> {
+
+        return productService.getProductImages(
+            productId = productId,
+        ).let {
+            CommonResponse(it)
+        }
+    }
+
     @GetMapping("/{shopId}/products")
     fun getProductList(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,

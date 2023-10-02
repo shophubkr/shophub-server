@@ -66,4 +66,8 @@ class Product(
     fun softDelete() {
         deleted = true
     }
+
+    fun getFirstImageUrl(): String {
+        return this.images[0].imgUrl
+    }
 }
