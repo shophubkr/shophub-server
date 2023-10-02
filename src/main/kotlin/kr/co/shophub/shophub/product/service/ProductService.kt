@@ -81,7 +81,7 @@ class ProductService(
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
-        ?: throw IllegalArgumentException("매장 정보를 찾을 수 없습니다."))
+        ?: throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다."))
 
     @Transactional(readOnly = true)
     fun getProduct(productId: Long): ProductResponse {
