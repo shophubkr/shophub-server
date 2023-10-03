@@ -20,7 +20,7 @@ class KakaoOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(
         val account = attributes["kakao_account"] as Map<*, *>
         val substring = UUID.randomUUID().toString().substring(0, 7)
         return if (account["email"] == null) {
-            "no-kakao-email-$substring"
+            "no-kakao-email-$substring@test.com"
         } else account["email"] as String
     }
 

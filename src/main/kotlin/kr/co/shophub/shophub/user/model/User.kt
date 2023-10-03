@@ -25,6 +25,8 @@ class User(
     var refreshToken: String = "empty",
     var providerId: String = "only-social",
     var profile: String = "only-social",
+    var telNum: String = "",
+    var bizNum: String = "",
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
@@ -49,6 +51,8 @@ class User(
         this.userRole = checkRole
         this.nickname = request.nickname
         this.password = request.password
+        this.telNum = request.phoneNumber
+        this.bizNum = request.bizNumber
     }
 
     fun updateRole() {

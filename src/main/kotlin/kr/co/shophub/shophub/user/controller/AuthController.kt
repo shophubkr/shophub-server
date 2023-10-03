@@ -40,11 +40,6 @@ class AuthController(
         return CommonResponse(tokenResponse)
     }
 
-    /**
-     * 소셜로 회원가입 시도시 OAuth에서 가져올 수 있는 내용을 담은 JoinReqeust를 반환한다.
-     * 이 반환값으로 화면을 구성하고 아래에 있는 메서드를 통해 누락된 / 수정해야 할 정보를 받아서
-     * 회원가입을 완료한다.
-     */
     @GetMapping("/add-info")
     fun getAdditionalInfo(@RequestParam token: String): CommonResponse<SocialJoinResponse> {
         return CommonResponse(authService.getAdditionalInfo(token))
@@ -55,12 +50,6 @@ class AuthController(
         return CommonResponse(authService.updateSocialInfo(joinRequest))
     }
 
-    /**
-     * 이메일 인증 부분 -> 아직 userId를 통해 인증을 구현한다.
-     * GUEST_BUYER -> USER
-     * GUEST_SELLER -> SELLER
-     * 위의 방식으로 UserRole을 업데이트 한다.
-     */
     @PatchMapping("/update/{userId}")
     fun updateRole(@PathVariable userId: Long) {
         authService.updateRole(userId)
