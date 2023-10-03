@@ -14,6 +14,7 @@ import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.AuthService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -25,12 +26,14 @@ class AuthServiceTest : BehaviorSpec({
     val passwordEncoder = mockk<PasswordEncoder>()
     val jwtService = mockk<JwtService>()
     val authenticationManager = mockk<AuthenticationManager>()
+    val publisher = mockk<ApplicationEventPublisher>()
 
     val authService = AuthService(
         userRepository,
         passwordEncoder,
         jwtService,
-        authenticationManager
+        authenticationManager,
+        publisher
     )
 
     Given("회원 가입 테스트") {

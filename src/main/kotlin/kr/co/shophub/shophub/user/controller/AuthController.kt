@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.user.controller
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.service.AuthService
-import kr.co.shophub.shophub.user.service.MailService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
-    private val mailService: MailService,
 ) {
 
     @PostMapping("/login")
@@ -49,11 +47,6 @@ class AuthController(
     @PostMapping("/add-info")
     fun updateEmailInfo(@RequestBody joinRequest: SocialJoinRequest): CommonResponse<UserResponse> {
         return CommonResponse(authService.updateSocialInfo(joinRequest))
-    }
-
-    @GetMapping("/mail")
-    fun sendAuthMail(@RequestBody mailRequest: MailRequest) {
-        mailService.sendMail(mailRequest)
     }
 
     @PatchMapping("/authorize")

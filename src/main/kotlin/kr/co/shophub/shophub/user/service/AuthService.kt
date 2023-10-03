@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.global.event.JoinEvent
 import kr.co.shophub.shophub.global.exception.failExtractEmail
 import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.global.jwt.service.JwtService
@@ -7,6 +8,7 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -19,6 +21,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
+    private val publisher: ApplicationEventPublisher,
 ) {
 
     @Transactional
@@ -33,6 +36,7 @@ class AuthService(
         checkEmail(user.email)
         checkNickname(user.nickname)
         user.encodePassword(passwordEncoder)
+        publisher.publishEvent(JoinEvent(user.email))
         return UserResponse.toResponse(userRepository.save(user))
     }
 
@@ -87,6 +91,7 @@ class AuthService(
         val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail) ?: failFindingUser()
         checkEmail(socialJoinRequest.newEmail)
         oldEmailUser.updateSocialInfo(socialJoinRequest, checkRole(socialJoinRequest.role))
+        publisher.publishEvent(JoinEvent(socialJoinRequest.newEmail))
         return UserResponse(oldEmailUser.id)
     }
 
