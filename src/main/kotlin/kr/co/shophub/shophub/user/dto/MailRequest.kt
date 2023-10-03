@@ -1,5 +1,5 @@
 package kr.co.shophub.shophub.user.dto
 
-data class MailAuthRequest(
+data class MailRequest(
     val email: String,
 )

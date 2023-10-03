@@ -44,7 +44,7 @@ class JwtService(
         const val EMAIL_CLAIM: String = "email"
         const val BEARER: String = "Bearer "
         const val JWT_TOKEN: String = "Authorization"
-        const val TEN_MINUTE = 60000L
+        const val TEN_MINUTE = 3600000
 
         private val logger = LoggerFactory.getLogger(JwtService::class.java)
     }

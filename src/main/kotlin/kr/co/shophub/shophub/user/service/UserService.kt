@@ -4,10 +4,7 @@ import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.repository.ShopRepository
-import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
-import kr.co.shophub.shophub.user.dto.MyPageResponse
-import kr.co.shophub.shophub.user.dto.CheckResponse
-import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
+import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -42,9 +39,9 @@ class UserService(
         user.encodePassword(passwordEncoder)
     }
 
-    fun checkPassword(oldPassword: String, userId: Long): CheckResponse {
+    fun checkPassword(request: PasswordRequest, userId: Long): CheckResponse {
         val user = getUser(userId)
-        if (!passwordEncoder.matches(oldPassword, user.password)) {
+        if (!passwordEncoder.matches(request.password, user.password)) {
             return CheckResponse("비밀번호가 일치하지 않습니다!")
         }
         return CheckResponse("비밀번호가 확인 되었습니다!")

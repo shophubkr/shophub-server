@@ -3,10 +3,7 @@ package kr.co.shophub.shophub.user.controller
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.login.service.LoginService
-import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
-import kr.co.shophub.shophub.user.dto.MyPageResponse
-import kr.co.shophub.shophub.user.dto.CheckResponse
-import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
+import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.service.MailService
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,22 +26,22 @@ class UserController(
         return CommonResponse(userService.getMyPage(userId))
     }
 
-    @PatchMapping("/my/update")
-    fun updateMyInfo(updateRequest: InfoUpdateRequest): CommonResponse<EmptyDto> {
+    @PatchMapping("/update")
+    fun updateMyInfo(@RequestBody updateRequest: InfoUpdateRequest): CommonResponse<EmptyDto> {
         val userId = getLoginId()
         userService.updateInfo(userId, updateRequest)
         return CommonResponse.EMPTY
     }
 
     @GetMapping("/check-password")
-    fun checkPassword(@RequestBody password: String): CommonResponse<CheckResponse> {
+    fun checkPassword(@RequestBody password: PasswordRequest): CommonResponse<CheckResponse> {
         val userId = getLoginId()
         return CommonResponse(userService.checkPassword(password, userId))
     }
 
     @GetMapping("/mail/password")
-    fun sendMailForPassword(@RequestBody email: String): CommonResponse<EmptyDto> {
-        mailService.sendMailForPassword(email)
+    fun sendMailForPassword(@RequestBody mailRequest: MailRequest): CommonResponse<EmptyDto> {
+        mailService.sendMailForPassword(mailRequest)
         return CommonResponse.EMPTY
     }
 

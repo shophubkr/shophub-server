@@ -52,8 +52,8 @@ class AuthController(
     }
 
     @GetMapping("/mail")
-    fun sendAuthMail(@RequestBody mailAuthRequest: MailAuthRequest) {
-        mailService.sendMail(mailAuthRequest)
+    fun sendAuthMail(@RequestBody mailRequest: MailRequest) {
+        mailService.sendMail(mailRequest)
     }
 
     @PatchMapping("/authorize")
