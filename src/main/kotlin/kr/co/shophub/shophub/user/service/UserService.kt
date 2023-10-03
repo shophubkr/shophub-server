@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.shop.dto.ShopListResponse
+import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.MyPageResponse
@@ -28,7 +30,7 @@ class UserService(
         val coupons = mutableListOf<String>()
         return MyPageResponse(
             email = user.email,
-            followShop = shops,
+            followShop = ShopListResponse(shops.map { ShopSimpleResponse(it) }),
             coupon = coupons
         )
     }
