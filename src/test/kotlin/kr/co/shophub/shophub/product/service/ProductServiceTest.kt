@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.product.dto.CreateProductRequest
 import kr.co.shophub.shophub.product.dto.ProductIdResponse
 import kr.co.shophub.shophub.product.dto.UpdateProductRequest
@@ -50,7 +51,6 @@ class ProductServiceTest : BehaviorSpec({
     val shopId = 1L
     val notShopId = 4L
     val sellerId = 1L
-    val notSellerId = 3L
     val shop = Shop(createShopRequest, sellerId).apply { id = shopId }
 
     val createProductRequest = CreateProductRequest(
@@ -146,7 +146,7 @@ class ProductServiceTest : BehaviorSpec({
         every { shopRepository.findByIdAndDeletedIsFalse(notShopId) } returns null
 
         When("상품을 생성하려고 시도할 때") {
-            val exception = shouldThrow<IllegalArgumentException> {
+            val exception = shouldThrow<ResourceNotFoundException> {
                 productService.createProduct(loginUserId, notShopId, createProductRequest,)
             }
 
