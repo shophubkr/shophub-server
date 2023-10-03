@@ -26,7 +26,7 @@ class AuthServiceTest : BehaviorSpec({
     val passwordEncoder = mockk<PasswordEncoder>()
     val jwtService = mockk<JwtService>()
     val authenticationManager = mockk<AuthenticationManager>()
-    val publisher = mockk<ApplicationEventPublisher>()
+    val publisher = mockk<ApplicationEventPublisher>(relaxed = true)
 
     val authService = AuthService(
         userRepository,
