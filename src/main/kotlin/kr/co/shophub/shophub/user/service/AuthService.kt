@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class AuthService(
@@ -90,8 +89,9 @@ class AuthService(
     }
 
     @Transactional
-    fun updateRole(userId: Long) {
-        val user = userRepository.findById(userId).getOrNull() ?: throw IllegalArgumentException()
+    fun authorizeEmail(token: String) {
+        val email = jwtService.extractEmail(token) ?: throw IllegalArgumentException("잘못된 이메일 정보 입니다.")
+        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
         user.updateRole()
     }
 
