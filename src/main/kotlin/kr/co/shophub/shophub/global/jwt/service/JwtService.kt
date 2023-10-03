@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.SignatureVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.http.HttpServletRequest
+import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.repository.UserRepository
@@ -51,7 +52,7 @@ class JwtService(
     fun makeTokenResponse(email: String): TokenResponse {
         val accessToken = createAccessToken(email)
         val refreshToken = createRefreshToken()
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException()
+        val user = userRepository.findByEmail(email) ?: failFindingUser()
         user.updateRefreshToken(refreshToken)
         return TokenResponse(accessToken, refreshToken)
     }

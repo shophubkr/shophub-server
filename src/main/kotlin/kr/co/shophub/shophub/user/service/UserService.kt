@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.repository.ShopRepository
@@ -11,7 +12,6 @@ import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.IllegalArgumentException
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -52,10 +52,10 @@ class UserService(
 
     @Transactional
     fun updatePassword(updateRequest: PasswordUpdateRequest) {
-        val user = userRepository.findByEmail(updateRequest.email) ?: throw IllegalArgumentException("유저를 찾을 수 없습니다.")
+        val user = userRepository.findByEmail(updateRequest.email) ?: failFindingUser()
         user.updatePassword(passwordEncoder, updateRequest.newPassword)
     }
 
     private fun getUser(userId: Long) =
-        userRepository.findById(userId).getOrNull() ?: throw IllegalArgumentException("유저를 찾을 수 없습니다.")
+        userRepository.findById(userId).getOrNull() ?: failFindingUser()
 }
