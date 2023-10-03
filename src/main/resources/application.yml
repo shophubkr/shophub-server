@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: local
-    include: jwt
+    include: secret
 
   jpa:
     hibernate:

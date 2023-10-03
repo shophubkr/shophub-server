@@ -1,6 +1,7 @@
 package kr.co.shophub.shophub.user.repository
 
-import kr.co.shophub.shophub.user.domain.User
+import kr.co.shophub.shophub.user.model.ProviderType
+import kr.co.shophub.shophub.user.model.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserRepository : JpaRepository<User, Long> {
@@ -8,4 +9,6 @@ interface UserRepository : JpaRepository<User, Long> {
     fun existsByNickname(nickname: String): Boolean
     fun findByEmail(email: String): User?
     fun findByRefreshToken(refreshToken: String): User?
+    fun findByProviderTypeAndProviderId(providerType: ProviderType, providerId: String): User?
+
 }

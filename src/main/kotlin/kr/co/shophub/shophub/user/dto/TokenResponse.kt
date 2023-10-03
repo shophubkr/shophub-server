@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.user.controller.dto.response
+package kr.co.shophub.shophub.user.dto
 
 data class TokenResponse(
     val accessToken: String,

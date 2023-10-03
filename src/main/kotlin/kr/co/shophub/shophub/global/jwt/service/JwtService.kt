@@ -8,7 +8,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.http.HttpServletRequest
 import kr.co.shophub.shophub.global.login.service.LoginService
-import kr.co.shophub.shophub.user.controller.dto.response.TokenResponse
+import kr.co.shophub.shophub.user.dto.TokenResponse
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -39,9 +39,11 @@ class JwtService(
     companion object {
         const val ACCESS_TOKEN_SUBJECT: String = "AccessToken"
         const val REFRESH_TOKEN_SUBJECT: String = "RefreshToken"
+        const val SIGN_UP_SUBJECT: String = "SignUp"
         const val EMAIL_CLAIM: String = "email"
         const val BEARER: String = "Bearer "
         const val JWT_TOKEN: String = "Authorization"
+        const val TEN_MINUTE = 60000L
 
         private val logger = LoggerFactory.getLogger(JwtService::class.java)
     }
@@ -71,6 +73,15 @@ class JwtService(
             .sign(Algorithm.HMAC512(secretKey))
     }
 
+    fun createTokenForOAuth2(email: String): String {
+        val now = Date()
+        return JWT.create()
+            .withSubject(SIGN_UP_SUBJECT)
+            .withExpiresAt(Date(now.time + TEN_MINUTE))
+            .withClaim(EMAIL_CLAIM, email)
+            .sign(Algorithm.HMAC512(secretKey))
+    }
+
     fun extractToken(request: HttpServletRequest): String? {
         val header = request.getHeader(JWT_TOKEN) ?: return null
         return if (header.startsWith(BEARER)) {
@@ -90,11 +101,11 @@ class JwtService(
         } else null
     }
 
-    private fun extractEmail(accessToken: String?): String? {
+    fun extractEmail(token: String?): String? {
         return try {
             JWT.require(Algorithm.HMAC512(secretKey))
                 .build()
-                .verify(accessToken)
+                .verify(token)
                 .getClaim(EMAIL_CLAIM)
                 .asString()
         } catch (e: Exception) {
