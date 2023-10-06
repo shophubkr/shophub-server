@@ -57,6 +57,12 @@ class UserService(
         user.updatePassword(passwordEncoder, updateRequest.newPassword)
     }
 
+    @Transactional
+    fun deleteUser(userId: Long) {
+        val user = getUser(userId)
+        user.softDelete()
+    }
+
     private fun getUser(userId: Long) =
         userRepository.findById(userId).getOrNull() ?: failFindingUser()
 }

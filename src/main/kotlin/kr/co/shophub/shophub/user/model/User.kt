@@ -80,4 +80,8 @@ class User(
         this.encodePassword(passwordEncoder)
     }
 
+    fun softDelete() {
+        this.deleted = true
+    }
+
 }

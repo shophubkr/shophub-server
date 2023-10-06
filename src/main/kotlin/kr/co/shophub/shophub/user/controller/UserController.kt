@@ -6,6 +6,7 @@ import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.service.MailService
 import kr.co.shophub.shophub.user.service.UserService
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -48,6 +49,13 @@ class UserController(
     @PatchMapping("/update/password")
     fun updatePassword(@RequestBody passwordUpdateRequest: PasswordUpdateRequest): CommonResponse<EmptyDto> {
         userService.updatePassword(passwordUpdateRequest)
+        return CommonResponse.EMPTY
+    }
+
+    @DeleteMapping
+    fun deleteUser(): CommonResponse<EmptyDto> {
+        val userId = getLoginId()
+        userService.deleteUser(userId)
         return CommonResponse.EMPTY
     }
 
