@@ -35,16 +35,20 @@ class UserService(
     @Transactional
     fun updateInfo(userId: Long, updateRequest: InfoUpdateRequest) {
         val user = getUser(userId)
-        user.updateInfo(updateRequest)
-        user.encodePassword(passwordEncoder)
+        if (updateRequest.nickname != null) {
+            user.updateNickname(updateRequest.nickname)
+        }
+        if (updateRequest.newPassword != null) {
+            user.updatePassword(passwordEncoder, updateRequest.newPassword)
+        }
     }
 
-    fun checkPassword(request: PasswordRequest, userId: Long): CheckResponse {
+    fun checkPassword(request: PasswordRequest, userId: Long): String {
         val user = getUser(userId)
         if (!passwordEncoder.matches(request.password, user.password)) {
-            return CheckResponse("비밀번호가 일치하지 않습니다!")
+            throw IllegalArgumentException("비밀 번호가 일치하지 않습니다.")
         }
-        return CheckResponse("비밀번호가 확인 되었습니다!")
+        return "비밀번호가 확인 되었습니다!"
     }
 
     @Transactional

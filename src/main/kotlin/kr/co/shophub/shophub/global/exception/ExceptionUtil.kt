@@ -1,9 +1,9 @@
 package kr.co.shophub.shophub.global.exception
 
-import java.lang.IllegalArgumentException
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 
 fun failFindingUser(): Nothing {
-    throw IllegalArgumentException("유저를 찾을 수 없습니다.")
+    throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
 }
 
 fun failExtractEmail(): Nothing {

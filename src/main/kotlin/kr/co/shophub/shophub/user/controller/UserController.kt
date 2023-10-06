@@ -34,7 +34,7 @@ class UserController(
     }
 
     @GetMapping("/check-password")
-    fun checkPassword(@RequestBody password: PasswordRequest): CommonResponse<CheckResponse> {
+    fun checkPassword(@RequestBody password: PasswordRequest): CommonResponse<String> {
         val userId = getLoginId()
         return CommonResponse(userService.checkPassword(password, userId))
     }

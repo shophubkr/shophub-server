@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import kr.co.shophub.shophub.global.oauth.OAuthAttributes
-import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.SocialJoinRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -72,9 +71,8 @@ class User(
         this.providerType = socialType
     }
 
-    fun updateInfo(request: InfoUpdateRequest) {
-        this.nickname = request.nickname
-        this.password = request.newPassword
+    fun updateNickname(nickname: String) {
+        this.nickname = nickname
     }
 
     fun updatePassword(passwordEncoder: PasswordEncoder, newPassword: String) {
