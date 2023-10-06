@@ -11,7 +11,7 @@ class EventListener(
     private val mailService: MailService,
 ) {
 
-    @Async
+    @Async("threadPoolTaskExecutor")
     @EventListener
     fun sendJoinMail(event: JoinEvent) {
         val mailRequest = MailRequest(event.email)
