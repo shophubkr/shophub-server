@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.dto.JoinRequest
 import kr.co.shophub.shophub.user.dto.LoginRequest
@@ -190,7 +191,7 @@ class AuthServiceTest : BehaviorSpec({
             every { jwtService.makeTokenResponse(user.email) } returns tokenResponse
 
             Then("재발행 실패") {
-                val message = shouldThrow<IllegalArgumentException> {
+                val message = shouldThrow<ResourceNotFoundException> {
                     authService.reIssueToken(refreshToken)
                 }.message
 

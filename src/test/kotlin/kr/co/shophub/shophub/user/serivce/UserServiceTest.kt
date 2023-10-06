@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.user.serivce
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -88,7 +89,7 @@ class UserServiceTest: BehaviorSpec({
             val checkResponse = userService.checkPassword(passwordRequest, userId)
 
             Then("비밀번호 확인 성공") {
-                checkResponse.result shouldBe "비밀번호가 확인 되었습니다!"
+                checkResponse shouldBe "비밀번호가 확인 되었습니다!"
             }
         }
 
@@ -96,10 +97,12 @@ class UserServiceTest: BehaviorSpec({
 
             every { passwordEncoder.matches(any(), any()) } returns false
 
-            val checkResponse = userService.checkPassword(passwordRequest, userId)
-
             Then("비밀번호 확인 성공") {
-                checkResponse.result shouldBe "비밀번호가 일치하지 않습니다!"
+                val message = shouldThrow<IllegalArgumentException> {
+                    userService.checkPassword(passwordRequest, userId)
+                }.message
+
+                message shouldBe "비밀 번호가 일치하지 않습니다."
             }
         }
 
