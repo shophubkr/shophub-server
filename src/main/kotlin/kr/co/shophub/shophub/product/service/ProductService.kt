@@ -36,6 +36,7 @@ class ProductService(
 
         val savedProduct = productRepository.save(product)
 
+        //Todo Shop에 product 추가 해야함
         saveImage(createProductRequest, savedProduct)
         saveTag(createProductRequest, savedProduct)
         saveCategory(createProductRequest, savedProduct)
