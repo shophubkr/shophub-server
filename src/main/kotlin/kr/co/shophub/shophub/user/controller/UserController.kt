@@ -35,14 +35,15 @@ class UserController(
     }
 
     @GetMapping("/check-password")
-    fun checkPassword(@RequestBody password: PasswordRequest): CommonResponse<String> {
+    fun checkPassword(@RequestBody password: PasswordRequest): CommonResponse<EmptyDto> {
         val userId = getLoginId()
-        return CommonResponse(userService.checkPassword(password, userId))
+        userService.checkPassword(password, userId)
+        return CommonResponse.EMPTY
     }
 
     @GetMapping("/mail/password")
     fun sendMailForPassword(@RequestBody mailRequest: MailRequest): CommonResponse<EmptyDto> {
-        mailService.sendMailForPassword(mailRequest)
+        mailService.sendPasswordMail(mailRequest)
         return CommonResponse.EMPTY
     }
 

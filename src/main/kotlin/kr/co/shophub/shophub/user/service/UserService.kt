@@ -43,12 +43,11 @@ class UserService(
         }
     }
 
-    fun checkPassword(request: PasswordRequest, userId: Long): String {
+    fun checkPassword(request: PasswordRequest, userId: Long) {
         val user = getUser(userId)
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw IllegalArgumentException("비밀 번호가 일치하지 않습니다.")
         }
-        return "비밀번호가 확인 되었습니다!"
     }
 
     @Transactional
