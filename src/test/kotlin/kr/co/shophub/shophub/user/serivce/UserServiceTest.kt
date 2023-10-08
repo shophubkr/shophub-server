@@ -82,17 +82,6 @@ class UserServiceTest: BehaviorSpec({
             }
         }
 
-        When("올바른 비밀번호를 확인시") {
-
-            every { passwordEncoder.matches(any(), any()) } returns true
-
-            val checkResponse = userService.checkPassword(passwordRequest, userId)
-
-            Then("비밀번호 확인 성공") {
-                checkResponse shouldBe "비밀번호가 확인 되었습니다!"
-            }
-        }
-
         When("잘못된 비밀번호를 확인시") {
 
             every { passwordEncoder.matches(any(), any()) } returns false

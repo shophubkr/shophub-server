@@ -15,7 +15,7 @@ class EventListener(
     @EventListener
     fun sendJoinMail(event: JoinEvent) {
         val mailRequest = MailRequest(event.email)
-        mailService.sendMail(mailRequest)
+        mailService.sendAuthorizeMail(mailRequest)
     }
 
 }
