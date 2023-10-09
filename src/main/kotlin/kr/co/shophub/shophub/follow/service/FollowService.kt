@@ -26,7 +26,7 @@ class FollowService(
         val user = getUser(userId)
         val shop = getShop(shopId)
 
-        if (followRepository.existByShopAndUser(shop, user)) {
+        if (followRepository.existsByShopAndUser(shop, user)) {
             followRepository.deleteByShopAndUser(shop, user)
             shop.cancelFollow()
         } else {

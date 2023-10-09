@@ -6,6 +6,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.follow.model.Follow
+import kr.co.shophub.shophub.follow.repository.FollowRepository
+import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
@@ -19,12 +22,12 @@ import kotlin.jvm.optionals.getOrNull
 
 class UserServiceTest: BehaviorSpec({
     val userRepository = mockk<UserRepository>()
-    val shopRepository = mockk<ShopRepository>()
+    val followRepository = mockk<FollowRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
 
     val userService = UserService(
         userRepository = userRepository,
-        shopRepository = shopRepository,
+        followRepository = followRepository,
         passwordEncoder = passwordEncoder
     )
 
@@ -39,7 +42,7 @@ class UserServiceTest: BehaviorSpec({
             nickname = "name",
         )
 
-        val shopList = mutableListOf<Shop>()
+        val shopList = mutableListOf<Follow>()
 
         val infoUpdateRequest = InfoUpdateRequest(
             nickname = "name",
@@ -58,7 +61,7 @@ class UserServiceTest: BehaviorSpec({
         When("마이페이지 접근시") {
 
             every { userRepository.findById(userId).getOrNull() } returns user
-            every { shopRepository.findAll() } returns shopList
+            every { followRepository.findByUser(any()) } returns shopList
 
             val myPageResponse = userService.getMyPage(userId)
 

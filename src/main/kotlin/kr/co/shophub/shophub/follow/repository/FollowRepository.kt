@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Modifying
 
 interface FollowRepository : JpaRepository<Follow, Long> {
 
-    fun existByShopAndUser(shop: Shop, user: User): Boolean
+    fun existsByShopAndUser(shop: Shop, user: User): Boolean
 
     fun findByUser(user: User): List<Follow>
 
