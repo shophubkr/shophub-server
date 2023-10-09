@@ -32,7 +32,7 @@ class Shop(
     var hourDescription: String,
 
     val level: Int = 1,
-    val followCnt: Int,
+    var followCnt: Int = 0,
 
     @field:NotNull
     val sellerId: Long,
@@ -88,5 +88,13 @@ class Shop(
 
     fun softDelete() {
         deleted = true
+    }
+
+    fun addFollow() {
+        this.followCnt++
+    }
+
+    fun cancelFollow() {
+        this.followCnt--
     }
 }
