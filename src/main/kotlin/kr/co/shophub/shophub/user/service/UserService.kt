@@ -1,10 +1,15 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.coupon.repository.CouponRepository
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.*
+import kr.co.shophub.shophub.user.model.UserCoupon
+import kr.co.shophub.shophub.user.model.UserCouponCond
+import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -17,6 +22,8 @@ class UserService(
     private val userRepository: UserRepository,
 //    private val followRepository: FollowRepository,
     private val shopRepository: ShopRepository,
+    private val userCouponRepository: UserCouponRepository,
+    private val couponRepository: CouponRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
 
@@ -30,6 +37,13 @@ class UserService(
             followShop = ShopListResponse(shops.map { ShopSimpleResponse(it) }),
             coupon = coupons
         )
+    }
+
+    fun getMyCoupons(userId: Long, status: UserCouponCond): UserCouponListResponse{
+        val userCoupons =
+            userCouponRepository.findUserCoupons(userId, status)
+                .map { userCoupon -> UserCouponResponse(userCoupon) }
+        return UserCouponListResponse(userCoupons)
     }
 
     @Transactional
@@ -62,6 +76,26 @@ class UserService(
         user.softDelete()
     }
 
+    @Transactional
+    fun receiveCoupon(couponId: Long, userId: Long): UserCouponIdResponse {
+        val coupon = findCoupon(couponId)
+        val user = getUser(userId)
+
+        val saveUserCoupon = userCouponRepository.save(UserCoupon(user = user, coupon = coupon))
+        user.userCoupon.add(saveUserCoupon)
+
+        return UserCouponIdResponse(saveUserCoupon.id)
+    }
+
+    private fun findCoupon(couponId: Long) = couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+
     private fun getUser(userId: Long) =
         userRepository.findById(userId).getOrNull() ?: failFindingUser()
+
+    @Transactional
+    fun useCoupon(userCouponId: Long) {
+        val userCoupon = (userCouponRepository.findById(userCouponId).getOrNull()
+            ?: throw ResourceNotFoundException("유저 쿠폰 정보를 찾을 수 없습니다."))
+        userCoupon.useCoupon()
+    }
 }

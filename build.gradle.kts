@@ -6,6 +6,8 @@ plugins {
 	kotlin("jvm") version "1.8.22"
 	kotlin("plugin.spring") version "1.8.22"
 	kotlin("plugin.jpa") version "1.8.22"
+	kotlin("kapt") version "1.7.10"
+
 }
 
 configurations {
@@ -28,6 +30,8 @@ repositories {
 	mavenCentral()
 }
 
+val queryDslVersion = "5.0.0"
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -49,9 +53,14 @@ dependencies {
 	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
 	testImplementation("io.kotest:kotest-assertions-core-jvm:4.6.0")
 	testImplementation("io.mockk:mockk:1.13.7")
-  
-  //oauth2
+
+	//oauth2
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+	implementation ("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
+	kapt("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
+	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
 	// mail
 	implementation ("org.springframework.boot:spring-boot-starter-mail")

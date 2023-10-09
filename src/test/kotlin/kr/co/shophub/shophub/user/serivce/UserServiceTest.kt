@@ -6,12 +6,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.PasswordRequest
 import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -21,11 +23,15 @@ class UserServiceTest: BehaviorSpec({
     val userRepository = mockk<UserRepository>()
     val shopRepository = mockk<ShopRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
+    val userCouponRepository = mockk<UserCouponRepository>()
+    val couponRepository = mockk<CouponRepository>()
 
     val userService = UserService(
         userRepository = userRepository,
         shopRepository = shopRepository,
-        passwordEncoder = passwordEncoder
+        passwordEncoder = passwordEncoder,
+        userCouponRepository = userCouponRepository,
+        couponRepository = couponRepository,
     )
 
     Given("로그인 상태에서") {
