@@ -5,7 +5,6 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.service.AuthService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -50,9 +49,9 @@ class AuthController(
         return CommonResponse(authService.updateSocialInfo(joinRequest))
     }
 
-    @PatchMapping("/update/{userId}")
-    fun updateRole(@PathVariable userId: Long) {
-        authService.updateRole(userId)
+    @PatchMapping("/authorize")
+    fun authorizeEmail(@RequestParam token: String) {
+        authService.authorizeEmail(token)
     }
 
     @GetMapping("/test")

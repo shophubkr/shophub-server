@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.dto.JoinRequest
 import kr.co.shophub.shophub.user.dto.LoginRequest
@@ -14,6 +15,7 @@ import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.AuthService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -25,12 +27,14 @@ class AuthServiceTest : BehaviorSpec({
     val passwordEncoder = mockk<PasswordEncoder>()
     val jwtService = mockk<JwtService>()
     val authenticationManager = mockk<AuthenticationManager>()
+    val publisher = mockk<ApplicationEventPublisher>(relaxed = true)
 
     val authService = AuthService(
         userRepository,
         passwordEncoder,
         jwtService,
-        authenticationManager
+        authenticationManager,
+        publisher
     )
 
     Given("회원 가입 테스트") {
@@ -187,11 +191,11 @@ class AuthServiceTest : BehaviorSpec({
             every { jwtService.makeTokenResponse(user.email) } returns tokenResponse
 
             Then("재발행 실패") {
-                val message = shouldThrow<IllegalArgumentException> {
+                val message = shouldThrow<ResourceNotFoundException> {
                     authService.reIssueToken(refreshToken)
                 }.message
 
-                message shouldBe "유저가 존재 하지 않습니다."
+                message shouldBe "유저를 찾을 수 없습니다."
             }
         }
     }

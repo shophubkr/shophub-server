@@ -1,16 +1,19 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.global.event.JoinEvent
+import kr.co.shophub.shophub.global.exception.failExtractEmail
+import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class AuthService(
@@ -18,6 +21,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
+    private val publisher: ApplicationEventPublisher,
 ) {
 
     @Transactional
@@ -32,6 +36,7 @@ class AuthService(
         checkEmail(user.email)
         checkNickname(user.nickname)
         user.encodePassword(passwordEncoder)
+        publisher.publishEvent(JoinEvent(user.email))
         return UserResponse.toResponse(userRepository.save(user))
     }
 
@@ -53,14 +58,14 @@ class AuthService(
     @Transactional
     fun reIssueToken(refreshToken: String): TokenResponse {
         checkToken(refreshToken)
-        val user = userRepository.findByRefreshToken(refreshToken) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        val user = userRepository.findByRefreshToken(refreshToken) ?: failFindingUser()
         return jwtService.makeTokenResponse(user.email)
     }
 
     @Transactional
     fun issueTokenOfOAuth(token: String): TokenResponse {
         checkToken(token)
-        val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
+        val email = jwtService.extractEmail(token) ?: failExtractEmail()
         return jwtService.makeTokenResponse(email)
     }
 
@@ -71,8 +76,8 @@ class AuthService(
     @Transactional(readOnly = true)
     fun getAdditionalInfo(token: String): SocialJoinResponse {
         checkToken(token)
-        val email = jwtService.extractEmail(token) ?: throw IllegalStateException("")
-        val socialUser = userRepository.findByEmail(email) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        val email = jwtService.extractEmail(token) ?: failExtractEmail()
+        val socialUser = userRepository.findByEmail(email) ?: failFindingUser()
         checkOAuthDuplicate(socialUser)
         return SocialJoinResponse(
             email = socialUser.email,
@@ -83,15 +88,17 @@ class AuthService(
 
     @Transactional
     fun updateSocialInfo(socialJoinRequest: SocialJoinRequest): UserResponse {
-        val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail) ?: throw IllegalArgumentException("유저가 존재 하지 않습니다.")
+        val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail) ?: failFindingUser()
         checkEmail(socialJoinRequest.newEmail)
         oldEmailUser.updateSocialInfo(socialJoinRequest, checkRole(socialJoinRequest.role))
+        publisher.publishEvent(JoinEvent(socialJoinRequest.newEmail))
         return UserResponse(oldEmailUser.id)
     }
 
     @Transactional
-    fun updateRole(userId: Long) {
-        val user = userRepository.findById(userId).getOrNull() ?: throw IllegalArgumentException()
+    fun authorizeEmail(token: String) {
+        val email = jwtService.extractEmail(token) ?: failExtractEmail()
+        val user = userRepository.findByEmail(email) ?: failFindingUser()
         user.updateRole()
     }
 
