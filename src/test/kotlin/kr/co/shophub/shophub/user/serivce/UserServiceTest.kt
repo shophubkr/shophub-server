@@ -8,9 +8,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kr.co.shophub.shophub.follow.model.Follow
 import kr.co.shophub.shophub.follow.repository.FollowRepository
-import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
-import kr.co.shophub.shophub.shop.model.Shop
-import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.PasswordRequest
 import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
