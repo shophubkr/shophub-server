@@ -19,7 +19,7 @@ class UserCouponCustomRepositoryImpl (
         status: UserCouponCond
     ): List<UserCoupon>{
         return queryFactory.selectFrom(userCoupon)
-            .join(userCoupon.coupon, coupon)
+            .join(userCoupon.coupon, coupon).fetchJoin()
             .where(
                 userCoupon.user.id.eq(userId).and(
                     couponSearchCond(status)
@@ -30,7 +30,7 @@ class UserCouponCustomRepositoryImpl (
         when (status) {
             UserCouponCond.USED -> userCoupon.isUsed.isTrue
             UserCouponCond.UNUSED -> userCoupon.isUsed.isFalse
-            UserCouponCond.EXPIRED -> coupon.expiredAt.before(LocalDate.now())
+            UserCouponCond.EXPIRED -> coupon.expiredAt.before(LocalDate.now()).or(coupon.isTerminated.isTrue)
         }
 }
 

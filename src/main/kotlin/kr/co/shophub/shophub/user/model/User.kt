@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.global.oauth.OAuthAttributes
-import kr.co.shophub.shophub.product.model.image.ProductImage
 import kr.co.shophub.shophub.user.dto.SocialJoinRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 

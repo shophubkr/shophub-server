@@ -11,7 +11,7 @@ class UserCoupon(
     @Column(name = "user_coupon_id")
     var id: Long = 0L,
 
-    var isUsed: Boolean = false,
+    private var isUsed: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
