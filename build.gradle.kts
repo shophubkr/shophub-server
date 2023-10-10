@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.8.22"
 	kotlin("plugin.spring") version "1.8.22"
 	kotlin("plugin.jpa") version "1.8.22"
+	kotlin("kapt") version "1.8.22"
 }
 
 configurations {
@@ -50,11 +51,18 @@ dependencies {
 	testImplementation("io.kotest:kotest-assertions-core-jvm:4.6.0")
 	testImplementation("io.mockk:mockk:1.13.7")
   
-  //oauth2
+    //oauth2
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
 	// mail
 	implementation ("org.springframework.boot:spring-boot-starter-mail")
+
+	// queryDSL
+	implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+	kapt ("com.querydsl:querydsl-apt:5.0.0:jakarta")
+	kapt ("jakarta.annotation:jakarta.annotation-api")
+	kapt ("jakarta.persistence:jakarta.persistence-api")
+
 }
 
 tasks.withType<KotlinCompile> {
@@ -70,4 +78,10 @@ tasks.named<Jar>("jar") {
 
 tasks.withType<Test>().configureEach  {
 	useJUnitPlatform()
+}
+
+allOpen {
+	annotation("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.MappedSuperclass")
+	annotation("jakarta.persistence.Embeddable")
 }
