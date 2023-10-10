@@ -15,7 +15,6 @@ import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.security.crypto.password.PasswordEncoder
-import kotlin.jvm.optionals.getOrNull
 
 class UserServiceTest: BehaviorSpec({
     val userRepository = mockk<UserRepository>()
@@ -57,7 +56,7 @@ class UserServiceTest: BehaviorSpec({
 
         When("마이페이지 접근시") {
 
-            every { userRepository.findById(userId).getOrNull() } returns user
+            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
             every { followRepository.findByUser(any()) } returns shopList
 
             val myPageResponse = userService.getMyPage(userId)
@@ -71,7 +70,7 @@ class UserServiceTest: BehaviorSpec({
 
         When("정보 수정 요청시") {
 
-            every { userRepository.findById(userId).getOrNull() } returns user
+            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
             every { passwordEncoder.encode(any()) } returns "newPassword"
 
             userService.updateInfo(userId, infoUpdateRequest)

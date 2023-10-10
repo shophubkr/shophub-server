@@ -9,7 +9,6 @@ import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
-import kotlin.jvm.optionals.getOrNull
 
 class FollowServiceTest : BehaviorSpec({
 
@@ -62,8 +61,8 @@ class FollowServiceTest : BehaviorSpec({
 
         When("팔로우 안한 가게를 팔로우 시") {
 
-            every { userRepository.findById(any()).getOrNull() } returns user
-            every { shopRepository.findById(any()).getOrNull() } returns shop
+            every { userRepository.findByIdAndDeletedIsFalse(any()) } returns user
+            every { shopRepository.findByIdAndDeletedIsFalse(any()) } returns shop
             every { followRepository.save(any()) } returns follow
             every { followRepository.existsByShopAndUser(any(), any()) } returns false
             every { followRepository.deleteByShopAndUser(any(), any()) } just Runs
@@ -81,8 +80,8 @@ class FollowServiceTest : BehaviorSpec({
 
         When("팔로우 한 가게를 팔로우 시") {
 
-            every { userRepository.findById(any()).getOrNull() } returns user
-            every { shopRepository.findById(any()).getOrNull() } returns followedShop
+            every { userRepository.findByIdAndDeletedIsFalse(any()) } returns user
+            every { shopRepository.findByIdAndDeletedIsFalse(any()) } returns followedShop
             every { followRepository.existsByShopAndUser(any(), any()) } returns true
             every { followRepository.deleteByShopAndUser(any(), any()) } just Runs
 
