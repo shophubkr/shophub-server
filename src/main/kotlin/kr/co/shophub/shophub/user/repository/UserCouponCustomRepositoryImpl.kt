@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.user.repository
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import kr.co.shophub.shophub.coupon.model.QCoupon.coupon
+import kr.co.shophub.shophub.shop.model.QShop.shop
 import kr.co.shophub.shophub.user.model.QUserCoupon.userCoupon
 import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
@@ -20,6 +21,7 @@ class UserCouponCustomRepositoryImpl (
     ): List<UserCoupon>{
         return queryFactory.selectFrom(userCoupon)
             .join(userCoupon.coupon, coupon).fetchJoin()
+            .join(coupon.shop, shop).fetchJoin()
             .where(
                 userCoupon.user.id.eq(userId).and(
                     couponSearchCond(status)

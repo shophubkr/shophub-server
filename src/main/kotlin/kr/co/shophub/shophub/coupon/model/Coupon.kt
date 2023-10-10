@@ -11,7 +11,7 @@ import java.time.LocalDate
 class Coupon(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coupon_id")
-    val id: Long = 0L,
+    var id: Long = 0L,
 
     @field:NotNull
     val content: String,

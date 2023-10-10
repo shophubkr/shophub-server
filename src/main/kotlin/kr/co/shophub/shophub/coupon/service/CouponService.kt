@@ -54,7 +54,7 @@ class CouponService(
     ) {
         val coupon = findCoupon(couponId)
         isOwnerOfShop(coupon.shop, userId)
-        coupon.terminateCoupon();
+        coupon.terminateCoupon()
     }
 
     private fun findCoupon(couponId: Long): Coupon {
