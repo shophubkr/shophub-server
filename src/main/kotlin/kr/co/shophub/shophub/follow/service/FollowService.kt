@@ -41,10 +41,11 @@ class FollowService(
         user: User
     ) = followRepository.existsByShopAndUser(shop, user)
 
-    fun getAllFollowShop(userId: Long, pageable: Pageable): Page<ShopSimpleResponse> {
+    fun getAllFollowShop(userId: Long, pageable: Pageable): Page<Shop> {
         val user = getUser(userId)
         return followRepository.findByUser(user, pageable)
-            .map { ShopSimpleResponse(it.shop) }
+            .map { it.shop }
+
     }
 
     private fun getUser(userId: Long): User {

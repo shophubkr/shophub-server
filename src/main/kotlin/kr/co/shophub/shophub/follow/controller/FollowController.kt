@@ -6,6 +6,8 @@ import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.dto.PageInfo
 import kr.co.shophub.shophub.global.login.service.LoginService
+import kr.co.shophub.shophub.shop.dto.ShopListResponse
+import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -36,7 +38,9 @@ class FollowController(
         val userId = loginService.getLoginUserId()
         val followShopPage = followService.getAllFollowShop(userId, pageable)
         return CommonResponse(
-            result = FollowPageResponse(followShopPage, followShopPage.size),
+            result = FollowPageResponse(
+                shopListResponse = ShopListResponse(followShopPage.content.map { ShopSimpleResponse(it) }),
+                followCount = followShopPage.content.size),
             page = PageInfo.of(followShopPage)
         )
     }
