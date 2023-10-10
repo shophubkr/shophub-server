@@ -1,15 +1,15 @@
 package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.follow.repository.FollowRepository
-import kr.co.shophub.shophub.global.exception.failFindingUser
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.user.dto.*
+import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
@@ -51,7 +51,8 @@ class UserService(
 
     @Transactional
     fun updatePassword(updateRequest: PasswordUpdateRequest) {
-        val user = userRepository.findByEmail(updateRequest.email) ?: failFindingUser()
+        val user = userRepository.findByEmail(updateRequest.email)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         user.updatePassword(passwordEncoder, updateRequest.newPassword)
     }
 
@@ -61,6 +62,8 @@ class UserService(
         user.softDelete()
     }
 
-    private fun getUser(userId: Long) =
-        userRepository.findById(userId).getOrNull() ?: failFindingUser()
+    private fun getUser(userId: Long): User {
+        return userRepository.findByIdAndDeletedIsFalse(userId)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
+    }
 }

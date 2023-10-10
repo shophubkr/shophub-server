@@ -2,8 +2,7 @@ package kr.co.shophub.shophub.follow.service
 
 import kr.co.shophub.shophub.follow.model.Follow
 import kr.co.shophub.shophub.follow.repository.FollowRepository
-import kr.co.shophub.shophub.global.exception.failFindingShop
-import kr.co.shophub.shophub.global.exception.failFindingUser
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
@@ -45,11 +43,13 @@ class FollowService(
     }
 
     private fun getUser(userId: Long): User {
-        return userRepository.findById(userId).getOrNull() ?: failFindingUser()
+        return userRepository.findByIdAndDeletedIsFalse(userId)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
     }
 
     private fun getShop(shopId: Long): Shop {
-        return shopRepository.findById(shopId).getOrNull() ?: failFindingShop()
+        return shopRepository.findByIdAndDeletedIsFalse(shopId)
+            ?: throw ResourceNotFoundException("매장을 찾을 수 없습니다.")
     }
 
 }
