@@ -26,7 +26,7 @@ class FollowService(
         val user = getUser(userId)
         val shop = getShop(shopId)
 
-        if (followRepository.existsByShopAndUser(shop, user)) {
+        if (isAlreadyFollow(shop, user)) {
             followRepository.deleteByShopAndUser(shop, user)
             shop.cancelFollow()
         } else {
@@ -35,6 +35,11 @@ class FollowService(
             shop.addFollow()
         }
     }
+
+    private fun isAlreadyFollow(
+        shop: Shop,
+        user: User
+    ) = followRepository.existsByShopAndUser(shop, user)
 
     fun getAllFollowShop(userId: Long, pageable: Pageable): Page<ShopSimpleResponse> {
         val user = getUser(userId)

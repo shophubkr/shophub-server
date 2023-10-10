@@ -1,6 +1,5 @@
 package kr.co.shophub.shophub.user.repository
 
-import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.user.model.ProviderType
 import kr.co.shophub.shophub.user.model.User
 import org.springframework.data.jpa.repository.JpaRepository
