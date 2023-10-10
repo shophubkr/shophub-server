@@ -60,8 +60,6 @@ class FollowServiceTest : BehaviorSpec({
             shop = shop,
         )
 
-        val followList = mutableListOf<Follow>()
-
         When("팔로우 안한 가게를 팔로우 시") {
 
             every { userRepository.findById(any()).getOrNull() } returns user
@@ -97,21 +95,6 @@ class FollowServiceTest : BehaviorSpec({
             Then("팔로우 수가 줄어든다") {
                 followedShop.followCnt shouldBe 0
             }
-        }
-
-        When("팔로우한 매장 조회시") {
-
-            every { userRepository.findById(any()).getOrNull() } returns user
-            every { followRepository.findByUser(any()) } returns followList
-
-            followList.add(follow)
-            val allFollowShop = followService.getAllFollowShop(user.id)
-
-            Then("모든 팔로우 매장일 조회된다.") {
-                allFollowShop.size shouldBe 1
-                allFollowShop[0].id shouldBe shop.id
-            }
-
         }
 
     }

@@ -9,6 +9,8 @@ import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.optionals.getOrNull
@@ -36,9 +38,9 @@ class FollowService(
         }
     }
 
-    fun getAllFollowShop(userId: Long): List<ShopSimpleResponse> {
+    fun getAllFollowShop(userId: Long, pageable: Pageable): Page<ShopSimpleResponse> {
         val user = getUser(userId)
-        return followRepository.findByUser(user)
+        return followRepository.findByUser(user, pageable)
             .map { ShopSimpleResponse(it.shop) }
     }
 
