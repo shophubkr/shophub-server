@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.user.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
+import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.global.oauth.OAuthAttributes
 import kr.co.shophub.shophub.user.dto.SocialJoinRequest
@@ -23,11 +24,10 @@ class User(
     @field:NotNull
     var nickname: String,
 
-    var refreshToken: String = "empty",
+    private var refreshToken: String = "empty",
     var providerId: String = "only-social",
     var profile: String = "only-social",
-    var telNum: String = "",
-    var bizNum: String = "",
+    var telNum: String,
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
@@ -37,6 +37,9 @@ class User(
 
     @Enumerated(EnumType.STRING)
     var providerType: ProviderType = ProviderType.NO_SOCIAL,
+
+    @OneToMany(mappedBy = "seller", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val businessList: MutableList<Business> = mutableListOf(),
 
 ): BaseEntity() {
     fun encodePassword(encoder: PasswordEncoder) {
@@ -53,15 +56,14 @@ class User(
         this.nickname = request.nickname
         this.password = request.password
         this.telNum = request.phoneNumber
-        this.bizNum = request.bizNumber
     }
 
     fun updateRole() {
         if (this.userRole == UserRole.GUEST_BUYER) {
-            this.userRole = UserRole.USER
+            this.userRole = UserRole.USER_BUYER
         }
         if (this.userRole == UserRole.GUEST_SELLER) {
-            this.userRole = UserRole.SELLER
+            this.userRole = UserRole.USER_SELLER
         }
     }
 
@@ -83,6 +85,11 @@ class User(
 
     fun softDelete() {
         this.deleted = true
+    }
+
+    fun addBusiness(business: Business) {
+        this.businessList.add(business)
+        this.userRole = UserRole.SELLER
     }
 
 }

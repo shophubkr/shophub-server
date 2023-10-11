@@ -13,6 +13,5 @@ data class JoinRequest(
     val nickname: String,
     val role: UserRole,
 
-    val phoneNumber: String = "only-seller",
-    val bizNumber: String = "only-seller",
+    val phoneNumber: String = "",
 )
