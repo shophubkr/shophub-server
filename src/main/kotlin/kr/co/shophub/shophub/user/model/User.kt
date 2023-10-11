@@ -88,4 +88,8 @@ class User(
         this.deleted = true
     }
 
+    fun addUserCoupon(saveUserCoupon: UserCoupon) {
+        this.userCoupon.add(saveUserCoupon)
+    }
+
 }

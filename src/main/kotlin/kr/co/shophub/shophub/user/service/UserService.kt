@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.exception.failFindingUser
@@ -11,6 +12,7 @@ import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,11 +41,12 @@ class UserService(
         )
     }
 
-    fun getMyCoupons(userId: Long, status: UserCouponCond): UserCouponListResponse{
+    fun getMyCoupons(userId: Long, status: UserCouponCond, pageable: Pageable): UserCouponListResponse{
         val userCoupons =
-            userCouponRepository.findUserCoupons(userId, status)
+            userCouponRepository.findUserCoupons(userId, status, pageable)
                 .map { userCoupon -> UserCouponResponse(userCoupon) }
-        return UserCouponListResponse(userCoupons)
+
+        return UserCouponListResponse(userCoupons, userCoupons.content.size)
     }
 
     @Transactional
@@ -82,12 +85,15 @@ class UserService(
         val user = getUser(userId)
 
         val saveUserCoupon = userCouponRepository.save(UserCoupon(user = user, coupon = coupon))
-        user.userCoupon.add(saveUserCoupon)
+        user.addUserCoupon(saveUserCoupon)
 
         return UserCouponIdResponse(saveUserCoupon.id)
     }
 
-    private fun findCoupon(couponId: Long) = couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+    private fun findCoupon(couponId: Long): Coupon {
+        return couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+            ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
+    }
 
     private fun getUser(userId: Long) =
         userRepository.findById(userId).getOrNull() ?: failFindingUser()

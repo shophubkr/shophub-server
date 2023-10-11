@@ -15,13 +15,13 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/coupon")
 class CouponController(
     private val couponService: CouponService,
     private val loginService: LoginService,
 ) {
 
-    @PostMapping("/{shopId}/coupon")
+    @PostMapping("/{shopId}")
     fun createCoupon(
         @PathVariable shopId: Long,
         @RequestBody createCouponRequest: CreateCouponRequest,
@@ -33,7 +33,7 @@ class CouponController(
         ).let { CommonResponse(it) }
     }
 
-    @GetMapping("/{shopId}/coupon")
+    @GetMapping("/{shopId}")
     fun getCouponList(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable shopId: Long,
@@ -50,7 +50,7 @@ class CouponController(
         )
     }
 
-    @PatchMapping("/coupon/{couponId}")
+    @PatchMapping("/{couponId}")
     fun earlyTerminateCoupon(
         @PathVariable couponId: Long
     ) :CommonResponse<EmptyDto>{

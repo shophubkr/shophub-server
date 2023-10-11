@@ -7,6 +7,9 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.UserCouponCond
 import kr.co.shophub.shophub.user.service.MailService
 import kr.co.shophub.shophub.user.service.UserService
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -24,9 +27,12 @@ class UserController(
     }
 
     @GetMapping("/my/coupon")
-    fun myCoupons(@RequestParam status: UserCouponCond): CommonResponse<UserCouponListResponse>{
+    fun myCoupons(
+        @RequestParam status: UserCouponCond,
+        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
+    ): CommonResponse<UserCouponListResponse>{
         val userId = getLoginId()
-        val myCoupons = userService.getMyCoupons(userId, status)
+        val myCoupons = userService.getMyCoupons(userId, status, pageable)
         return CommonResponse(myCoupons)
     }
 

@@ -93,4 +93,8 @@ class Shop(
     fun softDelete() {
         deleted = true
     }
+
+    fun addProduct(product: Product) {
+        products.add(product)
+    }
 }

@@ -7,6 +7,9 @@ import kr.co.shophub.shophub.shop.model.QShop.shop
 import kr.co.shophub.shophub.user.model.QUserCoupon.userCoupon
 import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
@@ -17,16 +20,24 @@ class UserCouponCustomRepositoryImpl (
 
     override fun findUserCoupons(
         userId: Long,
-        status: UserCouponCond
-    ): List<UserCoupon>{
-        return queryFactory.selectFrom(userCoupon)
+        status: UserCouponCond,
+        pageable: Pageable
+    ): Page<UserCoupon> {
+        val contents = queryFactory.selectFrom(userCoupon)
             .join(userCoupon.coupon, coupon).fetchJoin()
             .join(coupon.shop, shop).fetchJoin()
             .where(
                 userCoupon.user.id.eq(userId).and(
                     couponSearchCond(status)
                 )
-            ).fetch()
+            )
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .orderBy(userCoupon.createdAt.desc())
+            .fetch()
+        pageable.sort
+
+        return PageImpl(contents)
     }
     private fun couponSearchCond(status: UserCouponCond): BooleanExpression =
         when (status) {

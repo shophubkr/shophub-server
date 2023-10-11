@@ -14,6 +14,6 @@ interface CouponRepository : JpaRepository<Coupon, Long> {
         JOIN FETCH c.shop
         WHERE c.id = :couponId AND c.deleted = false
     """)
-    fun findByCouponIdAndDeletedIsFalse(couponId: Long): Coupon
+    fun findByCouponIdAndDeletedIsFalse(couponId: Long): Coupon?
     fun findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId: Long, isFinished: Boolean, pageable: Pageable): Page<Coupon>
 }

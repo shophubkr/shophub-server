@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 class CouponService(
     private val couponRepository: CouponRepository,
     private val shopRepository: ShopRepository,
@@ -38,11 +38,10 @@ class CouponService(
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
         ?: throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다."))
 
-    @Transactional(readOnly = true)
     fun getCouponList(
         shopId: Long,
-        pageable: Pageable,
-        isFinished: Boolean
+        isFinished: Boolean,
+        pageable: Pageable
     ): Page<Coupon> {
         return couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable)
     }
@@ -59,6 +58,7 @@ class CouponService(
 
     private fun findCoupon(couponId: Long): Coupon {
         return couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+            ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
     }
 
     private fun isOwnerOfShop(shop: Shop, loginUserId: Long) {
