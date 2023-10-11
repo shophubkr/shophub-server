@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import kr.co.shophub.shophub.shop.model.Shop
-import kr.co.shophub.shophub.shop.repository.ShopRepository
+import kr.co.shophub.shophub.follow.model.Follow
+import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.PasswordRequest
 import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
@@ -15,16 +15,15 @@ import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.security.crypto.password.PasswordEncoder
-import kotlin.jvm.optionals.getOrNull
 
 class UserServiceTest: BehaviorSpec({
     val userRepository = mockk<UserRepository>()
-    val shopRepository = mockk<ShopRepository>()
+    val followRepository = mockk<FollowRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
 
     val userService = UserService(
         userRepository = userRepository,
-        shopRepository = shopRepository,
+        followRepository = followRepository,
         passwordEncoder = passwordEncoder
     )
 
@@ -39,7 +38,7 @@ class UserServiceTest: BehaviorSpec({
             nickname = "name",
         )
 
-        val shopList = mutableListOf<Shop>()
+        val shopList = mutableListOf<Follow>()
 
         val infoUpdateRequest = InfoUpdateRequest(
             nickname = "name",
@@ -57,8 +56,8 @@ class UserServiceTest: BehaviorSpec({
 
         When("마이페이지 접근시") {
 
-            every { userRepository.findById(userId).getOrNull() } returns user
-            every { shopRepository.findAll() } returns shopList
+            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
+            every { followRepository.findByUser(any()) } returns shopList
 
             val myPageResponse = userService.getMyPage(userId)
 
@@ -71,7 +70,7 @@ class UserServiceTest: BehaviorSpec({
 
         When("정보 수정 요청시") {
 
-            every { userRepository.findById(userId).getOrNull() } returns user
+            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
             every { passwordEncoder.encode(any()) } returns "newPassword"
 
             userService.updateInfo(userId, infoUpdateRequest)
