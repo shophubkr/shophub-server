@@ -29,6 +29,7 @@ class FollowServiceTest : BehaviorSpec({
             email = "test@test.com",
             nickname = "name",
             password = "password",
+            telNum = "telNum"
         )
 
         val shop = Shop(

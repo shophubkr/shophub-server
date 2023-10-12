@@ -44,7 +44,7 @@ class ShopService(
         )
         val savedBusiness = businessRepository.save(business)
         seller.addBusiness(savedBusiness)
-        shop.addBusiness(savedBusiness)
+        savedShop.addBusiness(savedBusiness)
 
         return ShopIdResponse(savedShop.id)
     }
