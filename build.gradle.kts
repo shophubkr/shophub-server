@@ -24,10 +24,11 @@ version = "0.0.1-SNAPSHOT"
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
 }
-
 repositories {
 	mavenCentral()
 }
+
+val queryDslVersion = "5.0.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -50,19 +51,18 @@ dependencies {
 	testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
 	testImplementation("io.kotest:kotest-assertions-core-jvm:4.6.0")
 	testImplementation("io.mockk:mockk:1.13.7")
-  
-    //oauth2
+
+	//oauth2
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+	// queryDSL
+	implementation ("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
+	kapt("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
+	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
 	// mail
 	implementation ("org.springframework.boot:spring-boot-starter-mail")
-
-	// queryDSL
-	implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
-	kapt ("com.querydsl:querydsl-apt:5.0.0:jakarta")
-	kapt ("jakarta.annotation:jakarta.annotation-api")
-	kapt ("jakarta.persistence:jakarta.persistence-api")
-
 }
 
 tasks.withType<KotlinCompile> {
@@ -71,17 +71,9 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "17"
 	}
 }
-
 tasks.named<Jar>("jar") {
 	enabled = false
 }
-
 tasks.withType<Test>().configureEach  {
 	useJUnitPlatform()
-}
-
-allOpen {
-	annotation("jakarta.persistence.Entity")
-	annotation("jakarta.persistence.MappedSuperclass")
-	annotation("jakarta.persistence.Embeddable")
 }
