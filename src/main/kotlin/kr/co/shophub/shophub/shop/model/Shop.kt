@@ -32,8 +32,8 @@ class Shop(
     @Size(max = 20)
     var hourDescription: String,
 
-    val level: Int = 1,
-    val followCnt: Int,
+    var level: Int = 1,
+    var followCnt: Int = 0,
 
     @field:NotNull
     val sellerId: Long,
@@ -96,5 +96,15 @@ class Shop(
 
     fun addProduct(product: Product) {
         products.add(product)
+    }
+    
+    fun addFollow() {
+        this.followCnt++
+        this.level = followCnt/10 + 1
+    }
+
+    fun cancelFollow() {
+        this.followCnt--
+        this.level = followCnt/10 + 1
     }
 }

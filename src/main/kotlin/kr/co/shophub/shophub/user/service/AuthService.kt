@@ -1,8 +1,7 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.event.JoinEvent
-import kr.co.shophub.shophub.global.exception.failExtractEmail
-import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
@@ -58,14 +57,16 @@ class AuthService(
     @Transactional
     fun reIssueToken(refreshToken: String): TokenResponse {
         checkToken(refreshToken)
-        val user = userRepository.findByRefreshToken(refreshToken) ?: failFindingUser()
+        val user = userRepository.findByRefreshToken(refreshToken)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         return jwtService.makeTokenResponse(user.email)
     }
 
     @Transactional
     fun issueTokenOfOAuth(token: String): TokenResponse {
         checkToken(token)
-        val email = jwtService.extractEmail(token) ?: failExtractEmail()
+        val email = jwtService.extractEmail(token)
+            ?: throw IllegalStateException("토큰이 올바르지 않습니다.")
         return jwtService.makeTokenResponse(email)
     }
 
@@ -76,8 +77,10 @@ class AuthService(
     @Transactional(readOnly = true)
     fun getAdditionalInfo(token: String): SocialJoinResponse {
         checkToken(token)
-        val email = jwtService.extractEmail(token) ?: failExtractEmail()
-        val socialUser = userRepository.findByEmail(email) ?: failFindingUser()
+        val email = jwtService.extractEmail(token)
+            ?: throw IllegalStateException("토큰이 올바르지 않습니다.")
+        val socialUser = userRepository.findByEmail(email)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         checkOAuthDuplicate(socialUser)
         return SocialJoinResponse(
             email = socialUser.email,
@@ -88,7 +91,8 @@ class AuthService(
 
     @Transactional
     fun updateSocialInfo(socialJoinRequest: SocialJoinRequest): UserResponse {
-        val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail) ?: failFindingUser()
+        val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         checkEmail(socialJoinRequest.newEmail)
         oldEmailUser.updateSocialInfo(socialJoinRequest, checkRole(socialJoinRequest.role))
         publisher.publishEvent(JoinEvent(socialJoinRequest.newEmail))
@@ -97,8 +101,10 @@ class AuthService(
 
     @Transactional
     fun authorizeEmail(token: String) {
-        val email = jwtService.extractEmail(token) ?: failExtractEmail()
-        val user = userRepository.findByEmail(email) ?: failFindingUser()
+        val email = jwtService.extractEmail(token)
+            ?: throw IllegalStateException("토큰이 올바르지 않습니다.")
+        val user = userRepository.findByEmail(email)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         user.updateRole()
     }
 

@@ -4,39 +4,40 @@ import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.global.exception.failFindingUser
+import kr.co.shophub.shophub.follow.repository.FollowRepository
+import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
-import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
+import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
-//    private val followRepository: FollowRepository,
     private val shopRepository: ShopRepository,
     private val userCouponRepository: UserCouponRepository,
     private val couponRepository: CouponRepository,
+    private val followRepository: FollowRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
 
     fun getMyPage(userId: Long): MyPageResponse {
         val user = getUser(userId)
-        //팔로우 구현시 변경 예정
-        val shops = shopRepository.findAll()
+        val shops = followRepository.findByUser(user)
+            .map { ShopSimpleResponse(it.shop) }
         val coupons = mutableListOf<String>()
         return MyPageResponse(
             email = user.email,
-            followShop = ShopListResponse(shops.map { ShopSimpleResponse(it) }),
+            followShop = ShopListResponse(shops),
             coupon = coupons
         )
     }
@@ -69,7 +70,8 @@ class UserService(
 
     @Transactional
     fun updatePassword(updateRequest: PasswordUpdateRequest) {
-        val user = userRepository.findByEmail(updateRequest.email) ?: failFindingUser()
+        val user = userRepository.findByEmail(updateRequest.email)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         user.updatePassword(passwordEncoder, updateRequest.newPassword)
     }
 
@@ -95,13 +97,15 @@ class UserService(
             ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
     }
 
-    private fun getUser(userId: Long) =
-        userRepository.findById(userId).getOrNull() ?: failFindingUser()
-
     @Transactional
     fun useCoupon(userCouponId: Long) {
         val userCoupon = (userCouponRepository.findById(userCouponId).getOrNull()
             ?: throw ResourceNotFoundException("유저 쿠폰 정보를 찾을 수 없습니다."))
         userCoupon.useCoupon()
+    }
+    
+    private fun getUser(userId: Long): User {
+        return userRepository.findByIdAndDeletedIsFalse(userId)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
     }
 }
