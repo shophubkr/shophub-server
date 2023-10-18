@@ -1,20 +1,29 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.coupon.model.Coupon
+import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.model.UserCoupon
+import kr.co.shophub.shophub.user.model.UserCouponCond
+import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
+    private val userCouponRepository: UserCouponRepository,
+    private val couponRepository: CouponRepository,
     private val followRepository: FollowRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -29,6 +38,14 @@ class UserService(
             followShop = ShopListResponse(shops),
             coupon = coupons
         )
+    }
+
+    fun getMyCoupons(userId: Long, status: UserCouponCond, pageable: Pageable): UserCouponListResponse{
+        val userCoupons =
+            userCouponRepository.findUserCoupons(userId, status, pageable)
+                .map { userCoupon -> UserCouponResponse(userCoupon) }
+
+        return UserCouponListResponse(userCoupons, userCoupons.content.size)
     }
 
     @Transactional
@@ -62,6 +79,29 @@ class UserService(
         user.softDelete()
     }
 
+    @Transactional
+    fun receiveCoupon(couponId: Long, userId: Long): UserCouponIdResponse {
+        val coupon = findCoupon(couponId)
+        val user = getUser(userId)
+
+        val saveUserCoupon = userCouponRepository.save(UserCoupon(user = user, coupon = coupon))
+        user.addUserCoupon(saveUserCoupon)
+
+        return UserCouponIdResponse(saveUserCoupon.id)
+    }
+
+    private fun findCoupon(couponId: Long): Coupon {
+        return couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+            ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
+    }
+
+    @Transactional
+    fun useCoupon(userCouponId: Long) {
+        val userCoupon = (userCouponRepository.findById(userCouponId).getOrNull()
+            ?: throw ResourceNotFoundException("유저 쿠폰 정보를 찾을 수 없습니다."))
+        userCoupon.useCoupon()
+    }
+    
     private fun getUser(userId: Long): User {
         return userRepository.findByIdAndDeletedIsFalse(userId)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")

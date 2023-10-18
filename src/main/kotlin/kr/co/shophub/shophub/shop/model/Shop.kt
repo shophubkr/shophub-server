@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.shop.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.product.model.product.Product
 import kr.co.shophub.shophub.shop.dto.ChangeShopRequest
@@ -39,6 +40,9 @@ class Shop(
 
     @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var products: MutableList<Product> = mutableListOf(),
+
+    @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var coupons: MutableList<Coupon> = mutableListOf(),
 
     @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var images: MutableList<ShopImage> = mutableListOf(),
@@ -90,6 +94,10 @@ class Shop(
         deleted = true
     }
 
+    fun addProduct(product: Product) {
+        products.add(product)
+    }
+    
     fun addFollow() {
         this.followCnt++
         this.level = followCnt/10 + 1
