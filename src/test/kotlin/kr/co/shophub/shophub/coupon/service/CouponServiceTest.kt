@@ -95,7 +95,7 @@ class CouponServiceTest : BehaviorSpec({
         every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
 
         When("쿠폰 리스트를 조회할 때"){
-            val resultPage = couponService.getCouponList(shopId, pageable, isFinished)
+            val resultPage = couponService.getCouponList(shopId, isFinished, pageable)
 
             Then("쿠폰 리스트 페이지가 반환된다."){
                 resultPage shouldBe expectedPage
