@@ -2,28 +2,26 @@ package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
-import kr.co.shophub.shophub.global.error.ResourceNotFoundException
-import kr.co.shophub.shophub.global.exception.failFindingUser
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.user.dto.*
+import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
-import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
-    private val shopRepository: ShopRepository,
     private val userCouponRepository: UserCouponRepository,
     private val couponRepository: CouponRepository,
     private val followRepository: FollowRepository,
