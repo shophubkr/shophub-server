@@ -32,7 +32,7 @@ class AuthService(
             password = request.password,
             nickname = request.nickname,
             userRole = userRole,
-            telNum = telNum,
+            phoneNumber = telNum,
         )
         checkEmail(user.email)
         checkNickname(user.nickname)

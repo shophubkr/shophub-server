@@ -63,7 +63,7 @@ class OAuthAttributes(
             profile = oAuth2UserInfo.getImageUrl(),
             userRole = UserRole.GUEST_BUYER,
             password = PasswordUtil.generateRandomPassword(),
-            telNum = ""
+            phoneNumber = ""
         )
     }
 

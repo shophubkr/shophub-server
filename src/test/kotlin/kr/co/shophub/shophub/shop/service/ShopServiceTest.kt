@@ -60,7 +60,7 @@ class ShopServiceTest : BehaviorSpec({
         email = "email",
         password = "password",
         nickname = "nickname",
-        telNum = "telNum"
+        phoneNumber = "telNum"
     )
 
     val business = Business(

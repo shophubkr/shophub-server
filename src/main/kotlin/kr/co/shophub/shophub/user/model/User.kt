@@ -27,7 +27,7 @@ class User(
     private var refreshToken: String = "empty",
     var providerId: String = "only-social",
     var profile: String = "only-social",
-    var telNum: String,
+    var phoneNumber: String,
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
@@ -41,7 +41,7 @@ class User(
     @OneToMany(mappedBy = "seller", cascade = [CascadeType.ALL], orphanRemoval = true)
     val businessList: MutableList<Business> = mutableListOf(),
 
-): BaseEntity() {
+    ): BaseEntity() {
     fun encodePassword(encoder: PasswordEncoder) {
         this.password = encoder.encode(password)
     }
@@ -55,7 +55,7 @@ class User(
         this.userRole = checkRole
         this.nickname = request.nickname
         this.password = request.password
-        this.telNum = request.phoneNumber
+        this.phoneNumber = request.phoneNumber
     }
 
     fun updateRole() {
