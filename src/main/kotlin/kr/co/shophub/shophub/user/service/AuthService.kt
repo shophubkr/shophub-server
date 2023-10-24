@@ -137,6 +137,6 @@ class AuthService(
     }
 
     private fun isAuthenticated(user: User) =
-        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER_BUYER || user.userRole == UserRole.USER_SELLER
+        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER_BUYER
 
 }
