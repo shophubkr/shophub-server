@@ -6,8 +6,7 @@ plugins {
 	kotlin("jvm") version "1.8.22"
 	kotlin("plugin.spring") version "1.8.22"
 	kotlin("plugin.jpa") version "1.8.22"
-	kotlin("kapt") version "1.7.10"
-
+	kotlin("kapt") version "1.8.22"
 }
 
 configurations {
@@ -25,7 +24,6 @@ version = "0.0.1-SNAPSHOT"
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
 }
-
 repositories {
 	mavenCentral()
 }
@@ -57,6 +55,7 @@ dependencies {
 	//oauth2
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
+	// queryDSL
 	implementation ("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
 	kapt("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
 	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
@@ -72,11 +71,9 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "17"
 	}
 }
-
 tasks.named<Jar>("jar") {
 	enabled = false
 }
-
 tasks.withType<Test>().configureEach  {
 	useJUnitPlatform()
 }
