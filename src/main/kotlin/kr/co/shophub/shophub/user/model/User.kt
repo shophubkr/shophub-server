@@ -27,7 +27,7 @@ class User(
     private var refreshToken: String = "empty",
     var providerId: String = "only-social",
     var profile: String = "only-social",
-    var phoneNumber: String,
+    var phoneNumber: String = "",
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
