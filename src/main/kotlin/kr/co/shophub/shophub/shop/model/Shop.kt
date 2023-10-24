@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.shop.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.product.model.product.Product
 import kr.co.shophub.shophub.shop.dto.ChangeShopRequest
@@ -31,14 +32,17 @@ class Shop(
     @Size(max = 20)
     var hourDescription: String,
 
-    val level: Int = 1,
-    val followCnt: Int,
+    var level: Int = 1,
+    var followCnt: Int = 0,
 
     @field:NotNull
     val sellerId: Long,
 
     @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var products: MutableList<Product> = mutableListOf(),
+
+    @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var coupons: MutableList<Coupon> = mutableListOf(),
 
     @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var images: MutableList<ShopImage> = mutableListOf(),
@@ -88,5 +92,19 @@ class Shop(
 
     fun softDelete() {
         deleted = true
+    }
+
+    fun addProduct(product: Product) {
+        products.add(product)
+    }
+    
+    fun addFollow() {
+        this.followCnt++
+        this.level = followCnt/10 + 1
+    }
+
+    fun cancelFollow() {
+        this.followCnt--
+        this.level = followCnt/10 + 1
     }
 }

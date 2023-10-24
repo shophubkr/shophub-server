@@ -29,6 +29,9 @@ class User(
     var telNum: String = "",
     var bizNum: String = "",
 
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
+
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
 
@@ -83,6 +86,10 @@ class User(
 
     fun softDelete() {
         this.deleted = true
+    }
+
+    fun addUserCoupon(saveUserCoupon: UserCoupon) {
+        this.userCoupon.add(saveUserCoupon)
     }
 
 }
