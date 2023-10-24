@@ -39,6 +39,7 @@ class ProductService(
         saveImage(createProductRequest, savedProduct)
         saveTag(createProductRequest, savedProduct)
         saveCategory(createProductRequest, savedProduct)
+        shop.addProduct(product)
 
         return ProductIdResponse(savedProduct.id)
     }

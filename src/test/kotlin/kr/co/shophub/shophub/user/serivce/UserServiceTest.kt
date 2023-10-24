@@ -6,12 +6,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.follow.model.Follow
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.PasswordRequest
 import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -20,9 +22,13 @@ class UserServiceTest: BehaviorSpec({
     val userRepository = mockk<UserRepository>()
     val followRepository = mockk<FollowRepository>()
     val passwordEncoder = mockk<PasswordEncoder>()
+    val userCouponRepository = mockk<UserCouponRepository>()
+    val couponRepository = mockk<CouponRepository>()
 
     val userService = UserService(
         userRepository = userRepository,
+        userCouponRepository = userCouponRepository,
+        couponRepository = couponRepository,
         followRepository = followRepository,
         passwordEncoder = passwordEncoder
     )

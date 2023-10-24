@@ -29,6 +29,9 @@ class User(
     var profile: String = "only-social",
     var phoneNumber: String = "",
 
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
+
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
 
@@ -87,9 +90,14 @@ class User(
         this.deleted = true
     }
 
+
     fun addBusiness(business: Business) {
         this.businessList.add(business)
         this.userRole = UserRole.SELLER
+    }
+    
+    fun addUserCoupon(saveUserCoupon: UserCoupon) {
+        this.userCoupon.add(saveUserCoupon)
     }
 
 }
