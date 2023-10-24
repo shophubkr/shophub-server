@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable
 
 fun interface ShopTagRepositoryCustom {
 
-    fun searchAllShopTag(
+    fun searchAllShopWithShopTagAndProductTag(
         search : String,
         pageable: Pageable
     ) : Page<Shop>
