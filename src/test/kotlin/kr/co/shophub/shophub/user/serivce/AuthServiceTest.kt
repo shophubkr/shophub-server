@@ -51,6 +51,7 @@ class AuthServiceTest : BehaviorSpec({
             email = "test@test.com",
             password = "password",
             nickname = "name",
+            phoneNumber = "telNum",
         )
 
         When("정상 회원 가입 시도") {
@@ -149,6 +150,7 @@ class AuthServiceTest : BehaviorSpec({
             email = "test@test.com",
             password = "password",
             nickname = "name",
+            phoneNumber = "telNum",
         )
 
         val tokenResponse = TokenResponse(

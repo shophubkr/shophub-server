@@ -3,9 +3,12 @@ package kr.co.shophub.shophub.shop.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import kr.co.shophub.shophub.business.model.Business
+import kr.co.shophub.shophub.business.repository.BusinessRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.*
 import kr.co.shophub.shophub.shop.model.Shop
@@ -14,13 +17,16 @@ import kr.co.shophub.shophub.shop.model.ShopTag
 import kr.co.shophub.shophub.shop.repository.ShopImageRepository
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.shop.repository.ShopTagRepository
-import java.util.*
+import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.repository.UserRepository
 
 class ShopServiceTest : BehaviorSpec({
     val shopRepository = mockk<ShopRepository>()
     val shopImageRepository = mockk<ShopImageRepository>()
     val shopTagRepository = mockk<ShopTagRepository>()
-    val shopService = ShopService(shopRepository, shopImageRepository, shopTagRepository)
+    val userRepository = mockk<UserRepository>()
+    val businessRepository = mockk<BusinessRepository>()
+    val shopService = ShopService(shopRepository, shopImageRepository, shopTagRepository, userRepository, businessRepository)
 
     val sellerId = 1L
     val notSellerId = 3L
@@ -32,7 +38,8 @@ class ShopServiceTest : BehaviorSpec({
         introduce = "Shop Introduce",
         hour = "Shop Hour",
         hourDescription = "Shop Hour Description",
-        telNum = "123-456-7890"
+        telNum = "123-456-7890",
+        businessNumber = "bizNum"
     )
 
     val shopId = 2L
@@ -49,6 +56,19 @@ class ShopServiceTest : BehaviorSpec({
         telNum = "987-654-3210"
     )
 
+    val seller = User(
+        email = "email",
+        password = "password",
+        nickname = "nickname",
+        phoneNumber = "telNum"
+    )
+
+    val business = Business(
+        businessNumber = "bizNum",
+        seller = seller,
+        shop = shop,
+    )
+
     beforeTest {
         clearMocks(shopRepository, shopImageRepository, shopTagRepository)
     }
@@ -60,11 +80,20 @@ class ShopServiceTest : BehaviorSpec({
             every { shopRepository.save(any()) } returns shop
             every { shopImageRepository.saveAll(any<List<ShopImage>>()) } returns listOf(mockk())
             every { shopTagRepository.saveAll(any<List<ShopTag>>()) } returns listOf(mockk())
+            every { userRepository.findByIdAndDeletedIsFalse(sellerId) } returns seller
+            every { businessRepository.save(any()) } returns business
 
             val response = shopService.createShop(sellerId, createShopRequest)
 
             Then("ShopIdResponse를 반환해야 함") {
                 response shouldBe ShopIdResponse(shopId)
+            }
+
+            Then("올바른 비즈니스가 생성 된다.") {
+                seller.businessList.size shouldBe 1
+                seller.businessList[0].businessNumber shouldBe business.businessNumber
+                shop.business shouldNotBe null
+                shop.business?.businessNumber shouldBe business.businessNumber
             }
         }
 

@@ -26,11 +26,13 @@ class AuthService(
     @Transactional
     fun join(request: JoinRequest): UserResponse {
         val userRole = checkRole(request.role)
+        val telNum = checkTelNum(request)
         val user = User(
             email = request.email,
             password = request.password,
             nickname = request.nickname,
             userRole = userRole,
+            phoneNumber = telNum,
         )
         checkEmail(user.email)
         checkNickname(user.nickname)
@@ -40,11 +42,18 @@ class AuthService(
     }
 
     private fun checkRole(role: UserRole): UserRole {
-        return if (role == UserRole.USER) {
+        return if (role == UserRole.USER_BUYER) {
             UserRole.GUEST_BUYER
         } else {
             UserRole.GUEST_SELLER
         }
+    }
+
+    private fun checkTelNum(request: JoinRequest): String {
+        if (request.role == UserRole.SELLER && request.phoneNumber == "") {
+            throw IllegalArgumentException("전화번호 입력해 주세요.")
+        }
+        return request.phoneNumber
     }
 
     @Transactional
@@ -128,6 +137,6 @@ class AuthService(
     }
 
     private fun isAuthenticated(user: User) =
-        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER
+        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER_BUYER
 
 }

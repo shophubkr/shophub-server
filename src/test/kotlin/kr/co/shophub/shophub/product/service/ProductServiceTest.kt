@@ -45,7 +45,8 @@ class ProductServiceTest : BehaviorSpec({
         introduce = "Shop Introduce",
         hour = "Shop Hour",
         hourDescription = "Shop Hour Description",
-        telNum = "123-456-7890"
+        telNum = "123-456-7890",
+        businessNumber = "bizNum"
     )
 
     val shopId = 1L

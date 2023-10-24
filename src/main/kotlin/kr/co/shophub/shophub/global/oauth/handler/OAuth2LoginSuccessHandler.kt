@@ -38,7 +38,7 @@ class OAuth2LoginSuccessHandler(
 
     private fun isAlreadyJoin(user: CustomOAuth2User): Boolean {
         val existAlready = userRepository.existsByEmail(user.email)
-        val isAuthorized = user.role== UserRole.USER
+        val isAuthorized = user.role == UserRole.USER_BUYER || user.role == UserRole.USER_SELLER
         return existAlready && isAuthorized
     }
 

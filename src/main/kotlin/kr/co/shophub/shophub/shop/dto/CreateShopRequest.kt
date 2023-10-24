@@ -8,5 +8,6 @@ data class CreateShopRequest(
     val introduce : String,
     val hour : String,
     val hourDescription : String,
-    val telNum : String
+    val telNum : String,
+    val businessNumber: String,
 )

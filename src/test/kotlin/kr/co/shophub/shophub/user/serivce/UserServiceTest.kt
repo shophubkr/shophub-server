@@ -42,6 +42,7 @@ class UserServiceTest: BehaviorSpec({
             email = "test@test.com",
             password = "password",
             nickname = "name",
+            phoneNumber = "telNum",
         )
 
         val shopList = mutableListOf<Follow>()

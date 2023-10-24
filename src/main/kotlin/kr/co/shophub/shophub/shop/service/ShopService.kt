@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.shop.service
 
+import kr.co.shophub.shophub.business.model.Business
+import kr.co.shophub.shophub.business.repository.BusinessRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.*
 import kr.co.shophub.shophub.shop.model.Shop
@@ -8,6 +10,8 @@ import kr.co.shophub.shophub.shop.model.ShopTag
 import kr.co.shophub.shophub.shop.repository.ShopImageRepository
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.shop.repository.ShopTagRepository
+import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -18,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional
 class ShopService(
     private val shopRepository: ShopRepository,
     private val shopImageRepository: ShopImageRepository,
-    private val shopTagRepository: ShopTagRepository
+    private val shopTagRepository: ShopTagRepository,
+    private val userRepository: UserRepository,
+    private val businessRepository: BusinessRepository,
 ) {
 
     @Transactional
@@ -29,6 +35,16 @@ class ShopService(
         val savedShop = shopRepository.save(shop)
         replaceShopImages(savedShop, createShopRequest.images)
         replaceShopTags(savedShop, createShopRequest.tags)
+
+        val seller = getUser(sellerId)
+        val business = Business(
+            businessNumber = createShopRequest.businessNumber,
+            seller = seller,
+            shop = savedShop,
+        )
+        val savedBusiness = businessRepository.save(business)
+        seller.addBusiness(savedBusiness)
+        savedShop.addBusiness(savedBusiness)
 
         return ShopIdResponse(savedShop.id)
     }
@@ -88,6 +104,11 @@ class ShopService(
     fun findShop(shopId: Long): Shop {
         return shopRepository.findByIdAndDeletedIsFalse(shopId)
             ?: throw ResourceNotFoundException("존재하지 않는 상점입니다.")
+    }
+
+    private fun getUser(userId: Long): User {
+        return userRepository.findByIdAndDeletedIsFalse(userId)
+            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
     }
 
     companion object {
