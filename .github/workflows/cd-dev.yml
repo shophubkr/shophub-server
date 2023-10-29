@@ -3,6 +3,11 @@ name: DEV) Push Docker Image And Deploy to EC2
 on:
   push:
     branches: [ "develop" ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
 
 permissions:
   contents: read
@@ -15,7 +20,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -50,7 +55,7 @@ jobs:
 
       - name: Print branch & tag information
         run: |
-          echo "Current branch: ${{ github.event.inputs.branch }}"
+          echo "Current branch: ${{ github.event.inputs.branch || github.ref }}"
           echo "Current tag: ${{ steps.short_sha.outputs.sha_short }}"
 
       - name: Grant execute permission for gradlew
