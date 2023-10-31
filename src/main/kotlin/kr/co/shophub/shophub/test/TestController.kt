@@ -22,7 +22,6 @@ class TestController(
         throw UnauthenticatedException("User is not authenticated!")
     }
 
-
     @GetMapping("/forbidden")
     fun triggerForbiddenException(): String {
         throw ForbiddenException("Access is forbidden!")

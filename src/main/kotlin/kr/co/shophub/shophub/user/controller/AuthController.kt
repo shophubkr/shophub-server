@@ -29,7 +29,7 @@ class AuthController(
     }
 
     @PostMapping("/reissue")
-    fun refresh(@RequestBody tokenRequest: TokenRequest): CommonResponse<TokenResponse> {
+    fun reIssueToken(@RequestBody tokenRequest: TokenRequest): CommonResponse<TokenResponse> {
         return CommonResponse(authService.reIssueToken(tokenRequest.refreshToken))
     }
 
@@ -44,17 +44,14 @@ class AuthController(
         return CommonResponse(authService.getAdditionalInfo(token))
     }
 
-    @PostMapping("/add-info")
+    @PostMapping("/social-info")
     fun updateEmailInfo(@RequestBody joinRequest: SocialJoinRequest): CommonResponse<UserResponse> {
         return CommonResponse(authService.updateSocialInfo(joinRequest))
     }
 
-    @PatchMapping("/authorize")
+    @PatchMapping("/authorize-email")
     fun authorizeEmail(@RequestParam token: String) {
         authService.authorizeEmail(token)
     }
-
-    @GetMapping("/test")
-    fun test(): String = "pass"
 
 }

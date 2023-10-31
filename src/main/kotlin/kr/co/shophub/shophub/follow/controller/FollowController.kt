@@ -26,15 +26,18 @@ class FollowController(
 
     @PostMapping("/{shopId}")
     fun followShop(@PathVariable shopId: Long): CommonResponse<EmptyDto> {
+
         val userId = loginService.getLoginUserId()
         followService.followShop(userId, shopId)
         return CommonResponse.EMPTY
+
     }
 
-    @GetMapping("/shop")
+    @GetMapping("/shops")
     fun getAllFollowShop(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable
     ): CommonResponse<FollowPageResponse> {
+
         val userId = loginService.getLoginUserId()
         val followShopPage = followService.getAllFollowShop(userId, pageable)
         return CommonResponse(
@@ -43,5 +46,6 @@ class FollowController(
                 followCount = followShopPage.content.size),
             page = PageInfo.of(followShopPage)
         )
+
     }
 }
