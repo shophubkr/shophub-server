@@ -1,8 +1,6 @@
 name: DEV) Push Docker Image And Deploy to EC2
 
 on:
-  push:
-    branches: [ "develop" ]
   workflow_dispatch:
     inputs:
       branch:
