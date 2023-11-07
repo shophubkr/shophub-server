@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.follow.service
 import kr.co.shophub.shophub.follow.model.Follow
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
-import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.user.model.User
