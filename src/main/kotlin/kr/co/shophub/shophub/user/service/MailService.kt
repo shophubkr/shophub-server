@@ -29,7 +29,9 @@ class MailService(
     }
 
     fun sendPasswordMail(mailRequest: MailRequest) {
-        require(userRepository.existsByEmail(mailRequest.email)) { "가입 정보와 일치하지 않습니다." }
+        if (!userRepository.existsByEmail(mailRequest.email)) {
+            throw IllegalStateException("가입 정보와 일치하지 않습니다.")
+        }
         val message = SimpleMailMessage()
         val link = "비밀번호 재설정용 링크"
         message.setTo(mailRequest.email)
