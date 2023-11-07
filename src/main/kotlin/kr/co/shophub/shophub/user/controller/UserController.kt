@@ -13,20 +13,20 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 class UserController(
     private val loginService: LoginService,
     private val userService: UserService,
     private val mailService: MailService,
 ) {
 
-    @GetMapping("/my")
-    fun myPage(): CommonResponse<MyPageResponse> {
+    @GetMapping("/me")
+    fun myInfo(): CommonResponse<MyPageResponse> {
         val userId = getLoginId()
         return CommonResponse(userService.getMyPage(userId))
     }
 
-    @GetMapping("/my/coupon")
+    @GetMapping("/me/coupons")
     fun myCoupons(
         @RequestParam status: UserCouponCond,
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
@@ -36,7 +36,7 @@ class UserController(
         return CommonResponse(myCoupons)
     }
 
-    @PatchMapping("/update")
+    @PatchMapping("/me/info")
     fun updateMyInfo(@RequestBody updateRequest: InfoUpdateRequest): CommonResponse<EmptyDto> {
         val userId = getLoginId()
         userService.updateInfo(userId, updateRequest)
@@ -56,7 +56,7 @@ class UserController(
         return CommonResponse.EMPTY
     }
 
-    @PatchMapping("/update/password")
+    @PatchMapping("/update-password")
     fun updatePassword(@RequestBody passwordUpdateRequest: PasswordUpdateRequest): CommonResponse<EmptyDto> {
         userService.updatePassword(passwordUpdateRequest)
         return CommonResponse.EMPTY
@@ -69,7 +69,7 @@ class UserController(
         return CommonResponse.EMPTY
     }
 
-    @PostMapping("/{couponId}")
+    @PostMapping("/coupons/{couponId}")
     fun receiveCoupon(
         @PathVariable couponId: Long
     ): CommonResponse<UserCouponIdResponse> {
@@ -77,11 +77,11 @@ class UserController(
         return CommonResponse(userService.receiveCoupon(couponId, userId))
     }
 
-    @PatchMapping("/{userCouponId}")
+    @PatchMapping("/coupons/{couponId}")
     fun useCoupon(
-        @PathVariable userCouponId: Long
+        @PathVariable couponId: Long
     ): CommonResponse<EmptyDto> {
-        userService.useCoupon(userCouponId)
+        userService.useCoupon(couponId)
         return CommonResponse.EMPTY
     }
 

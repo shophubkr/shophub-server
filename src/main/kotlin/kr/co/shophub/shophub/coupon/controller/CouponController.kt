@@ -15,30 +15,33 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/coupon")
+@RequestMapping("/api/v1")
 class CouponController(
     private val couponService: CouponService,
     private val loginService: LoginService,
 ) {
 
-    @PostMapping("/{shopId}")
+    @PostMapping("/shops/{shopId}/coupons")
     fun createCoupon(
         @PathVariable shopId: Long,
         @RequestBody createCouponRequest: CreateCouponRequest,
     ): CommonResponse<CouponIdResponse> {
+
         return couponService.createCoupon(
             createCouponRequest = createCouponRequest,
             userId = loginService.getLoginUserId(),
             shopId = shopId
         ).let { CommonResponse(it) }
+
     }
 
-    @GetMapping("/{shopId}")
+    @GetMapping("/shops/{shopId}/coupons")
     fun getCouponList(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable shopId: Long,
         @RequestParam isFinished: Boolean,
     ): CommonResponse<CouponListResponse> {
+
         val couponList = couponService.getCouponList(
             shopId = shopId,
             pageable = pageable,
@@ -48,17 +51,20 @@ class CouponController(
             result = CouponListResponse(couponList.content.map { CouponResponse(it) }),
             page = PageInfo.of(page = couponList)
         )
+
     }
 
-    @PatchMapping("/{couponId}")
+    @PatchMapping("/coupons/{couponId}")
     fun earlyTerminateCoupon(
         @PathVariable couponId: Long
     ) :CommonResponse<EmptyDto>{
+
         val userId = loginService.getLoginUserId()
         couponService.terminateCoupon(
             couponId = couponId,
             userId = userId
         )
         return CommonResponse.EMPTY
+
     }
 }
