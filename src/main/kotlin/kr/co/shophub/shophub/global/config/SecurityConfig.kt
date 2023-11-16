@@ -47,6 +47,8 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .csrf(CsrfConfigurer<HttpSecurity>::disable)
+            .cors {cors ->
+                cors.configurationSource(corsConfigurationSource())}
             .formLogin(FormLoginConfigurer<HttpSecurity>::disable)
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }

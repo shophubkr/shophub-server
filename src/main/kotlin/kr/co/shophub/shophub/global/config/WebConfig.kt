@@ -15,7 +15,7 @@ class WebConfig : WebMvcConfigurer {
             .allowedOrigins(
                 "http://localhost:3000",
                 "http://13.209.100.56",
-                "http://13.209.100.56:8081"
+                "http://13.209.100.56:8081",
             )
             .allowedHeaders(ALLOWED_HEADER_NAMES)
             .allowedMethods(*ALLOWED_METHOD_NAMES.split(",").toTypedArray())
