@@ -17,7 +17,8 @@ class WebConfig : WebMvcConfigurer {
                 "http://13.209.100.56",
                 "http://13.209.100.56:8081",
             )
-            .allowedHeaders(ALLOWED_HEADER_NAMES)
-            .allowedMethods(*ALLOWED_METHOD_NAMES.split(",").toTypedArray())
+            .allowedHeaders("*")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS" , "PATCH")
+            .exposedHeaders("Authorization", "RefreshToken")
     }
 }

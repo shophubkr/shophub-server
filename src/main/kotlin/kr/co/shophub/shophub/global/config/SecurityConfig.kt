@@ -47,8 +47,6 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .csrf(CsrfConfigurer<HttpSecurity>::disable)
-            .cors {cors ->
-                cors.configurationSource(corsConfigurationSource())}
             .formLogin(FormLoginConfigurer<HttpSecurity>::disable)
             .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
@@ -91,31 +89,6 @@ class SecurityConfig(
     @Bean
     fun jwtAuthenticationProcessingFilter(): JwtAuthenticationProcessingFilter? {
         return JwtAuthenticationProcessingFilter(jwtService)
-    }
-
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowCredentials = true
-        configuration.allowedOrigins = listOf(
-            "http://localhost:3000",
-            "http://13.209.100.56",
-            "http://13.209.100.56:8081"
-        )
-        configuration.allowedMethods = listOf(
-            HttpMethod.POST.name(),
-            HttpMethod.GET.name(),
-            HttpMethod.PUT.name(),
-            HttpMethod.DELETE.name(),
-            HttpMethod.OPTIONS.name()
-        )
-        configuration.allowedHeaders = listOf("*")
-
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        val bean = FilterRegistrationBean(CorsFilter(source))
-        bean.order = 0
-        return source
     }
 
 }
