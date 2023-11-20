@@ -14,6 +14,7 @@ class WebConfig : WebMvcConfigurer {
         registry.addMapping("/**")
             .allowedOrigins(
                 "http://localhost:3000",
+                "http://localhost:8081",
                 "http://13.209.100.56",
                 "http://13.209.100.56:8081",
             )
