@@ -42,11 +42,16 @@ class AuthService(
     }
 
     private fun checkRole(role: UserRole): UserRole {
-        return if (role == UserRole.USER_BUYER) {
-            UserRole.GUEST_BUYER
-        } else {
-            UserRole.GUEST_SELLER
+        if (role == UserRole.SELLER || role == UserRole.ADMIN) {
+            throw IllegalArgumentException("잘못된 요청입니다.")
         }
+        if (role == UserRole.USER_BUYER) {
+            return UserRole.GUEST_BUYER
+        }
+        if (role == UserRole.USER_SELLER) {
+            return UserRole.GUEST_SELLER
+        }
+        return UserRole.GUEST_BUYER
     }
 
     private fun checkTelNum(request: JoinRequest): String {
