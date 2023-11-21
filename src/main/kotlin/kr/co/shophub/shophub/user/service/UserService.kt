@@ -99,7 +99,12 @@ class UserService(
             ?: throw ResourceNotFoundException("유저 쿠폰 정보를 찾을 수 없습니다."))
         userCoupon.useCoupon()
     }
-    
+
+    fun findSimpleInfo(userId: Long): SimpleInfoResponse {
+        val user = getUser(userId)
+        return SimpleInfoResponse(user.nickname, user.profile)
+    }
+
     private fun getUser(userId: Long): User {
         return userRepository.findByIdAndDeletedIsFalse(userId)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
