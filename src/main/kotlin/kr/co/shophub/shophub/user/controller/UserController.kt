@@ -91,6 +91,12 @@ class UserController(
         return CommonResponse(userService.findSimpleInfo(userId))
     }
 
+    @GetMapping("/check-nickname")
+    fun checkNickname(@RequestBody nicknameRequest: NicknameRequest): CommonResponse<EmptyDto> {
+        userService.checkNickname(nicknameRequest)
+        return CommonResponse.EMPTY
+    }
+
     private fun getLoginId(): Long {
         return loginService.getLoginUserId()
     }

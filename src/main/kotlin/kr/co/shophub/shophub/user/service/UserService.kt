@@ -109,4 +109,8 @@ class UserService(
         return userRepository.findByIdAndDeletedIsFalse(userId)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
     }
+
+    fun checkNickname(nicknameRequest: NicknameRequest) {
+        require(!userRepository.existsByNickname(nicknameRequest.nickname)) { "해당 닉네임이 이미 존재합니다." }
+    }
 }
