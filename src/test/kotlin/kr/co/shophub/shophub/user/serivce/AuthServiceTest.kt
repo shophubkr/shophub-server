@@ -43,7 +43,7 @@ class AuthServiceTest : BehaviorSpec({
             "test@test.com",
             "password",
             "name",
-            UserRole.GUEST_BUYER
+            UserRole.USER_BUYER
         )
 
         val user = User(

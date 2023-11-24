@@ -42,10 +42,10 @@ class AuthService(
     }
 
     private fun checkRole(role: UserRole): UserRole {
-        return if (role == UserRole.USER_BUYER) {
-            UserRole.GUEST_BUYER
-        } else {
-            UserRole.GUEST_SELLER
+        return when(role) {
+            UserRole.USER_SELLER -> UserRole.GUEST_SELLER
+            UserRole.USER_BUYER -> UserRole.GUEST_BUYER
+            else -> throw IllegalArgumentException("잘못된 요청입니다.")
         }
     }
 

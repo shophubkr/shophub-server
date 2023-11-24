@@ -85,6 +85,18 @@ class UserController(
         return CommonResponse.EMPTY
     }
 
+    @GetMapping("/me/simple-info")
+    fun getSimpleInfo(): CommonResponse<SimpleInfoResponse> {
+        val userId = getLoginId()
+        return CommonResponse(userService.findSimpleInfo(userId))
+    }
+
+    @GetMapping("/check-nickname")
+    fun checkNickname(@RequestBody nicknameRequest: NicknameRequest): CommonResponse<EmptyDto> {
+        userService.checkNickname(nicknameRequest)
+        return CommonResponse.EMPTY
+    }
+
     private fun getLoginId(): Long {
         return loginService.getLoginUserId()
     }
