@@ -111,6 +111,6 @@ class UserService(
     }
 
     fun checkNickname(nicknameRequest: NicknameRequest) {
-        require(!userRepository.existsByNickname(nicknameRequest.nickname)) { "해당 닉네임이 이미 존재합니다." }
+        check(!userRepository.existsByNickname(nicknameRequest.nickname)) { "해당 닉네임이 이미 존재합니다." }
     }
 }
