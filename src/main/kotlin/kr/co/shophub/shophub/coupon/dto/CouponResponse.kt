@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit
 data class CouponResponse (
     val id: Long,
     val content: String,
+    val detail: String,
     val isFinished: Boolean,
     val startedAt: LocalDate,
     val expiredAt: LocalDate,
@@ -15,6 +16,7 @@ data class CouponResponse (
     constructor(coupon: Coupon): this(
         id = coupon.id,
         content = coupon.content,
+        detail = coupon.detail,
         isFinished = coupon.isTerminated,
         startedAt = coupon.startedAt,
         expiredAt = coupon.expiredAt,

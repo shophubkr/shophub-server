@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -28,11 +29,17 @@ class CouponService(
         val shop = findShop(shopId)
         isOwnerOfShop(shop, userId)
 
+        validateCreateCouponRequest(createCouponRequest.startedAt, createCouponRequest.expiredAt)
+
         val coupon = Coupon(createCouponRequest, shop)
         shop.coupons.add(coupon)
         val saveCoupon = couponRepository.save(coupon)
 
         return CouponIdResponse(saveCoupon.id)
+    }
+
+    private fun validateCreateCouponRequest(startedAt: LocalDate, expiredAt: LocalDate) {
+        require(startedAt.isBefore(expiredAt)) {"기간 설정이 잘못 되었습니다."}
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
@@ -43,6 +50,7 @@ class CouponService(
         isFinished: Boolean,
         pageable: Pageable
     ): Page<Coupon> {
+        findShop(shopId)
         return couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable)
     }
 
