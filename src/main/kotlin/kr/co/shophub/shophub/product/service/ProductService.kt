@@ -99,6 +99,7 @@ class ProductService(
 
     @Transactional(readOnly = true)
     fun getProductList(shopId: Long, pageable: Pageable): Page<Product> {
+        findShop(shopId)
         return productRepository.findAllByShopIdAndDeletedIsFalse(shopId, pageable)
     }
 
