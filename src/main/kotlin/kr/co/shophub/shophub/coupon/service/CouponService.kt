@@ -45,12 +45,18 @@ class CouponService(
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
         ?: throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다."))
 
+    private fun isNotShopExist(shopId: Long) {
+        if (!shopRepository.existsByIdAndDeletedIsFalse(shopId)) {
+            throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다.")
+        }
+    }
+
     fun getCouponList(
         shopId: Long,
         isFinished: Boolean,
         pageable: Pageable
     ): Page<Coupon> {
-        findShop(shopId)
+        isNotShopExist(shopId)
         return couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable)
     }
 

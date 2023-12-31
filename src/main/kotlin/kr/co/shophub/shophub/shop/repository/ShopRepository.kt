@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface ShopRepository : JpaRepository<Shop, Long> {
     fun findAllByNameAndTelNumAndDeletedIsFalse(name: String, telNum: String): List<Shop>
     fun findByIdAndDeletedIsFalse(id: Long): Shop?
+    fun existsByIdAndDeletedIsFalse(id: Long): Boolean
     fun findAllByDeletedIsFalse(pageable: Pageable): Page<Shop>
     fun existsByNameAndDeletedIsFalse(name: String): Boolean
 }
