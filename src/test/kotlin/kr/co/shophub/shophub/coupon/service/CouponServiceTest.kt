@@ -43,6 +43,7 @@ class CouponServiceTest : BehaviorSpec({
 
     val createCouponRequest = CreateCouponRequest(
         content = "Test coupon content",
+        detail = "Test coupon detail",
         startedAt = LocalDate.of(2023, 10, 10),
         expiredAt = LocalDate.of(2023, 10, 12)
     )
@@ -64,7 +65,7 @@ class CouponServiceTest : BehaviorSpec({
 
         When("쿠폰의 요청값이 잘못되었을 때"){
             val exception = shouldThrow<IllegalArgumentException> {
-                createCouponRequest.copy(expiredAt = LocalDate.of(2023, 10, 9))
+                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2023, 10, 9)), sellerId, shopId)
             }
 
             Then("에러가 발생한다."){
@@ -93,7 +94,7 @@ class CouponServiceTest : BehaviorSpec({
         val expectedPage = PageImpl(listOf(coupon))
 
         every { couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable) } returns expectedPage
-        every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
+        every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
 
         When("쿠폰 리스트를 조회할 때"){
             val resultPage = couponService.getCouponList(shopId, isFinished, pageable)
