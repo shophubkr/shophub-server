@@ -15,5 +15,5 @@ interface CouponRepository : JpaRepository<Coupon, Long> {
         WHERE c.id = :couponId AND c.deleted = false
     """)
     fun findByCouponIdAndDeletedIsFalse(couponId: Long): Coupon?
-    fun findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId: Long, isFinished: Boolean, pageable: Pageable): Page<Coupon>
+    fun findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId: Long, isTerminated: Boolean, pageable: Pageable): Page<Coupon>
 }

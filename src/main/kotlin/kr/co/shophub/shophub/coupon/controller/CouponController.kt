@@ -39,7 +39,7 @@ class CouponController(
     fun getCouponList(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable shopId: Long,
-        @RequestParam isFinished: Boolean,
+        @RequestParam isFinished: Boolean = false,
     ): CommonResponse<CouponListResponse> {
 
         val couponList = couponService.getCouponList(

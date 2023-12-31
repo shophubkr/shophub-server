@@ -17,6 +17,9 @@ class Coupon(
     val content: String,
 
     @field:NotNull
+    val detail: String,
+
+    @field:NotNull
     val startedAt: LocalDate,
 
     @field:NotNull
@@ -34,6 +37,7 @@ class Coupon(
 
     constructor(createCouponRequest: CreateCouponRequest, shop: Shop): this(
         content = createCouponRequest.content,
+        detail = createCouponRequest.detail,
         startedAt = createCouponRequest.startedAt,
         expiredAt = createCouponRequest.expiredAt,
         shop = shop,
