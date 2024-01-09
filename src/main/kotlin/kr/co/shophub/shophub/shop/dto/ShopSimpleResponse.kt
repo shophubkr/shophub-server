@@ -20,4 +20,14 @@ data class ShopSimpleResponse(
         minPrice = shop.products.minByOrNull { it.price }?.price ?: 0,
         checkCoupon = true
     )
+
+    constructor(shop: Shop, ids: List<Long>) : this(
+        id = shop.id,
+        image = shop.images[0].imgUrl,
+        name = shop.name,
+        address = shop.address,
+        introduce = shop.introduce,
+        minPrice = shop.products.minByOrNull { it.price }?.price ?: 0,
+        checkCoupon = ids.contains(shop.id)
+    )
 }
