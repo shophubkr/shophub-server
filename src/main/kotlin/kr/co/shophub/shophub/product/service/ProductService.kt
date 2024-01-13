@@ -81,6 +81,12 @@ class ProductService(
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
         ?: throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다."))
 
+    private fun isNotShopExist(shopId: Long) {
+        if (!shopRepository.existsByIdAndDeletedIsFalse(shopId)) {
+            throw ResourceNotFoundException("매장 정보를 찾을 수 없습니다.")
+        }
+    }
+
     @Transactional(readOnly = true)
     fun getProduct(productId: Long): ProductResponse {
         val product = findProduct(productId)
@@ -99,6 +105,7 @@ class ProductService(
 
     @Transactional(readOnly = true)
     fun getProductList(shopId: Long, pageable: Pageable): Page<Product> {
+        isNotShopExist(shopId)
         return productRepository.findAllByShopIdAndDeletedIsFalse(shopId, pageable)
     }
 
