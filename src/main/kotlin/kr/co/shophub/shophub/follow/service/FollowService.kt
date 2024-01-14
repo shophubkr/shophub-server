@@ -45,9 +45,9 @@ class FollowService(
 
     fun getAllFollowShop(userId: Long, pageable: Pageable, condition: SortCondition): Page<ShopSimpleResponse> {
         val user = getUser(userId)
-        val followShopIds = user.userCoupon.map { it.coupon.shop.id }
+        val hasCouponShopIds = user.userCoupon.map { it.coupon.shop.id }
         var followedShops = followRepository.findByUser(user)
-            .map { ShopSimpleResponse(it.shop, followShopIds) }
+            .map { ShopSimpleResponse(it.shop, hasCouponShopIds) }
             .sortedByDescending { it.id }
 
         if (condition.hasCoupon) {
