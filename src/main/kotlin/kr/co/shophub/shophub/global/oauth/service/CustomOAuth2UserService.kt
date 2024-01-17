@@ -22,7 +22,6 @@ class CustomOAuth2UserService(
 
     companion object {
         const val NAVER = "naver"
-        const val KAKAO = "kakao"
         const val GOOGLE = "google"
     }
 
@@ -54,7 +53,6 @@ class CustomOAuth2UserService(
     private fun getSocialType(registrationId: String): ProviderType {
         return when (registrationId) {
             NAVER -> ProviderType.NAVER
-            KAKAO -> ProviderType.KAKAO
             GOOGLE -> ProviderType.GOOGLE
             else -> ProviderType.NO_SOCIAL
         }

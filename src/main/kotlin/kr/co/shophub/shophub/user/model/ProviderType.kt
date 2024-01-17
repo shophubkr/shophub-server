@@ -5,6 +5,5 @@ enum class ProviderType(
 ) {
     GOOGLE("google"),
     NAVER("naver"),
-    KAKAO("kakao"),
     NO_SOCIAL("no_social");
 }
