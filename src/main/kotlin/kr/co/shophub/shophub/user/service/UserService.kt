@@ -30,8 +30,9 @@ class UserService(
 
     fun getMyPage(userId: Long): MyPageResponse {
         val user = getUser(userId)
+        val followShopIds = user.userCoupon.map { it.coupon.shop.id }
         val shops = followRepository.findByUser(user)
-            .map { ShopSimpleResponse(it.shop) }
+            .map { ShopSimpleResponse(it.shop, followShopIds) }
         val coupons = mutableListOf<String>()
         return MyPageResponse(
             email = user.email,
