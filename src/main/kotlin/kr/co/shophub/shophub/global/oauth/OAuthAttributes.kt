@@ -1,6 +1,9 @@
 package kr.co.shophub.shophub.global.oauth
 
-import kr.co.shophub.shophub.global.oauth.userInfo.*
+import kr.co.shophub.shophub.global.oauth.userInfo.GoogleOAuth2UserInfo
+import kr.co.shophub.shophub.global.oauth.userInfo.NaverOAuth2UserInfo
+import kr.co.shophub.shophub.global.oauth.userInfo.NoSocialOAuth2USerInfo
+import kr.co.shophub.shophub.global.oauth.userInfo.OAuth2UserInfo
 import kr.co.shophub.shophub.global.oauth.util.PasswordUtil
 import kr.co.shophub.shophub.user.model.ProviderType
 import kr.co.shophub.shophub.user.model.User
@@ -18,24 +21,15 @@ class OAuthAttributes(
         ): OAuthAttributes {
             return when (socialType) {
                 ProviderType.NAVER -> ofNaver(userNameAttributeName, attributes)
-                ProviderType.KAKAO -> ofKakao(userNameAttributeName, attributes)
                 ProviderType.GOOGLE -> ofGoogle(userNameAttributeName, attributes)
                 ProviderType.NO_SOCIAL -> ofNoSocial(userNameAttributeName, attributes)
             }
         }
 
-
         private fun ofNaver(userNameAttributeName: String, attributes: MutableMap<String, Any>): OAuthAttributes {
             return OAuthAttributes(
                 userNameAttributeName,
                 NaverOAuth2UserInfo(attributes),
-            )
-        }
-
-        private fun ofKakao(userNameAttributeName: String, attributes: MutableMap<String, Any>): OAuthAttributes {
-            return OAuthAttributes(
-                userNameAttributeName,
-                KakaoOAuth2UserInfo(attributes),
             )
         }
 
@@ -61,7 +55,7 @@ class OAuthAttributes(
             providerType = providerType,
             email = oAuth2UserInfo.getEmail(),
             profile = oAuth2UserInfo.getImageUrl(),
-            userRole = UserRole.GUEST_BUYER,
+            userRole = UserRole.SOCIAL_GUEST,
             password = PasswordUtil.generateRandomPassword(),
         )
     }

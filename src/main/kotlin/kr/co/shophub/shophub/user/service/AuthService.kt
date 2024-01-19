@@ -1,13 +1,11 @@
 package kr.co.shophub.shophub.user.service
 
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
-import kr.co.shophub.shophub.global.event.JoinEvent
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -20,33 +18,22 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
-    private val publisher: ApplicationEventPublisher,
 ) {
 
     @Transactional
     fun join(request: JoinRequest): UserResponse {
-        val userRole = checkRole(request.role)
         val telNum = checkTelNum(request)
         val user = User(
             email = request.email,
             password = request.password,
             nickname = request.nickname,
-            userRole = userRole,
+            userRole = request.role,
             phoneNumber = telNum,
         )
         checkEmail(user.email)
         checkNickname(user.nickname)
         user.encodePassword(passwordEncoder)
-        publisher.publishEvent(JoinEvent(user.email))
         return UserResponse.toResponse(userRepository.save(user))
-    }
-
-    private fun checkRole(role: UserRole): UserRole {
-        return when(role) {
-            UserRole.USER_SELLER -> UserRole.GUEST_SELLER
-            UserRole.USER_BUYER -> UserRole.GUEST_BUYER
-            else -> throw IllegalArgumentException("잘못된 요청입니다.")
-        }
     }
 
     private fun checkTelNum(request: JoinRequest): String {
@@ -90,7 +77,6 @@ class AuthService(
             ?: throw IllegalStateException("토큰이 올바르지 않습니다.")
         val socialUser = userRepository.findByEmail(email)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
-        checkOAuthDuplicate(socialUser)
         return SocialJoinResponse(
             email = socialUser.email,
             password = socialUser.password,
@@ -103,25 +89,8 @@ class AuthService(
         val oldEmailUser = userRepository.findByEmail(socialJoinRequest.oldEmail)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         checkEmail(socialJoinRequest.newEmail)
-        oldEmailUser.updateSocialInfo(socialJoinRequest, checkRole(socialJoinRequest.role))
-        publisher.publishEvent(JoinEvent(socialJoinRequest.newEmail))
+        oldEmailUser.updateSocialInfo(socialJoinRequest, socialJoinRequest.role)
         return UserResponse(oldEmailUser.id)
-    }
-
-    @Transactional
-    fun authorizeEmail(token: String) {
-        val email = jwtService.extractEmail(token)
-            ?: throw IllegalStateException("토큰이 올바르지 않습니다.")
-        val user = userRepository.findByEmail(email)
-            ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
-        user.updateRole()
-    }
-
-    private fun checkOAuthDuplicate(user: User) {
-        if (isAuthenticated(user)) {
-            checkEmail(user.email)
-            checkNickname(user.nickname)
-        }
     }
 
     private fun checkEmail(email: String) {
@@ -135,8 +104,5 @@ class AuthService(
             throw IllegalStateException("이미 가입한 닉네임 입니다.")
         }
     }
-
-    private fun isAuthenticated(user: User) =
-        user.userRole == UserRole.SELLER || user.userRole == UserRole.USER_BUYER
 
 }

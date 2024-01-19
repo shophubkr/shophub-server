@@ -36,7 +36,7 @@ class User(
     private var deleted: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    var userRole: UserRole = UserRole.GUEST_BUYER,
+    var userRole: UserRole = UserRole.USER_BUYER,
 
     @Enumerated(EnumType.STRING)
     var providerType: ProviderType = ProviderType.NO_SOCIAL,
@@ -59,15 +59,6 @@ class User(
         this.nickname = request.nickname
         this.password = request.password
         this.phoneNumber = request.phoneNumber
-    }
-
-    fun updateRole() {
-        if (this.userRole == UserRole.GUEST_BUYER) {
-            this.userRole = UserRole.USER_BUYER
-        }
-        if (this.userRole == UserRole.GUEST_SELLER) {
-            this.userRole = UserRole.USER_SELLER
-        }
     }
 
     fun mergeInfo(attributes: OAuthAttributes, socialType: ProviderType) {

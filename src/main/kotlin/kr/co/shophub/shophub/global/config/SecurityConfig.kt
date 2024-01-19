@@ -1,11 +1,11 @@
 package kr.co.shophub.shophub.global.config
 
-import kr.co.shophub.shophub.global.oauth.handler.OAuth2LoginFailureHandler
 import kr.co.shophub.shophub.global.jwt.error.JwtAccessDeniedHandler
 import kr.co.shophub.shophub.global.jwt.error.JwtAuthenticationEntryPoint
 import kr.co.shophub.shophub.global.jwt.filter.JwtAuthenticationProcessingFilter
 import kr.co.shophub.shophub.global.jwt.service.JwtService
 import kr.co.shophub.shophub.global.login.service.LoginService
+import kr.co.shophub.shophub.global.oauth.handler.OAuth2LoginFailureHandler
 import kr.co.shophub.shophub.global.oauth.handler.OAuth2LoginSuccessHandler
 import kr.co.shophub.shophub.global.oauth.service.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean

@@ -33,7 +33,7 @@ class OAuth2LoginSuccessHandler(
     }
 
     private fun isNewJoin(user: CustomOAuth2User): Boolean {
-        return user.role == UserRole.GUEST_SELLER || user.role == UserRole.GUEST_BUYER
+        return user.role == UserRole.SOCIAL_GUEST
     }
 
     private fun isAlreadyJoin(user: CustomOAuth2User): Boolean {
