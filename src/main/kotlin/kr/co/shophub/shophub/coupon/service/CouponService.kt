@@ -9,8 +9,10 @@ import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.LocalDate
 
 @Service
@@ -18,7 +20,14 @@ import java.time.LocalDate
 class CouponService(
     private val couponRepository: CouponRepository,
     private val shopRepository: ShopRepository,
+    private val clock: Clock,
 ) {
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    fun scheduled() {
+        couponRepository.updateCouponByExpiredAt()
+    }
 
     @Transactional
     fun createCoupon(
@@ -28,7 +37,6 @@ class CouponService(
     ): CouponIdResponse {
         val shop = findShop(shopId)
         isOwnerOfShop(shop, userId)
-
         validateCreateCouponRequest(createCouponRequest.startedAt, createCouponRequest.expiredAt)
 
         val coupon = Coupon(createCouponRequest, shop)
@@ -39,7 +47,9 @@ class CouponService(
     }
 
     private fun validateCreateCouponRequest(startedAt: LocalDate, expiredAt: LocalDate) {
+        val now = LocalDate.now(clock)
         require(startedAt.isBefore(expiredAt)) {"기간 설정이 잘못 되었습니다."}
+        require(now.isBefore(startedAt)) {"시작 날짜를 다시 확인해주세요."}
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
@@ -57,7 +67,7 @@ class CouponService(
         pageable: Pageable
     ): Page<Coupon> {
         isNotShopExist(shopId)
-        return couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable)
+        return couponRepository.findByExpiredAt(shopId, isFinished, pageable)
     }
 
     @Transactional

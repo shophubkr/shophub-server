@@ -41,7 +41,6 @@ class CouponController(
         @PathVariable shopId: Long,
         @RequestParam isFinished: Boolean = false,
     ): CommonResponse<CouponListResponse> {
-
         val couponList = couponService.getCouponList(
             shopId = shopId,
             pageable = pageable,

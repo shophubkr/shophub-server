@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/test")
-class TestController(
-) {
+class TestController {
     @GetMapping("/illegal-argument")
     fun triggerIllegalArgumentException(): String {
         throw IllegalArgumentException("Illegal argument provided!")

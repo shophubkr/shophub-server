@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
-import java.time.LocalDate
 
 @Repository
 class UserCouponCustomRepositoryImpl (
@@ -42,8 +41,8 @@ class UserCouponCustomRepositoryImpl (
     private fun couponSearchCond(status: UserCouponCond): BooleanExpression =
         when (status) {
             UserCouponCond.USED -> userCoupon.isUsed.isTrue
-            UserCouponCond.UNUSED -> userCoupon.isUsed.isFalse
-            UserCouponCond.EXPIRED -> coupon.expiredAt.before(LocalDate.now()).or(coupon.isTerminated.isTrue)
+            UserCouponCond.UNUSED -> userCoupon.isUsed.isFalse.and(coupon.isTerminated.isFalse)
+            UserCouponCond.EXPIRED -> userCoupon.isUsed.isFalse.and(coupon.isTerminated.isTrue)
         }
 }
 

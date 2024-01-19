@@ -3,7 +3,8 @@ package kr.co.shophub.shophub.coupon.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
 import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
 import kr.co.shophub.shophub.coupon.model.Coupon
@@ -14,14 +15,18 @@ import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneOffset
 
 class CouponServiceTest : BehaviorSpec({
 
     val couponRepository : CouponRepository = mockk()
     val shopRepository : ShopRepository = mockk()
+    val clock : Clock = Clock.fixed(Instant.parse("3333-08-22T10:00:00Z"), ZoneOffset.UTC)
 
-    val couponService = CouponService(couponRepository, shopRepository)
+    val couponService = CouponService(couponRepository, shopRepository, clock)
 
     val createShopRequest = CreateShopRequest(
         name = "Test Shop",
@@ -44,8 +49,8 @@ class CouponServiceTest : BehaviorSpec({
     val createCouponRequest = CreateCouponRequest(
         content = "Test coupon content",
         detail = "Test coupon detail",
-        startedAt = LocalDate.of(2023, 10, 10),
-        expiredAt = LocalDate.of(2023, 10, 12)
+        startedAt = LocalDate.of(2024, 2, 10),
+        expiredAt = LocalDate.of(2024, 4, 12)
     )
 
     val couponId = 1L
@@ -63,13 +68,24 @@ class CouponServiceTest : BehaviorSpec({
             }
         }
 
-        When("쿠폰의 요청값이 잘못되었을 때"){
+        When("쿠폰 만료일자가 생성일자보다 더 빠르면"){
             val exception = shouldThrow<IllegalArgumentException> {
-                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2023, 10, 9)), sellerId, shopId)
+                //startedAt = LocalDate.of(2024, 2, 10)
+                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2024, 1, 1)), sellerId, shopId)
+            }
+            Then("에러가 발생한다."){
+                exception.message shouldBe "기간 설정이 잘못 되었습니다."
+            }
+        }
+
+        When("오늘 일자보다 생성일자가 더 빠르면"){
+            val exception = shouldThrow<IllegalArgumentException> {
+                //now = 3333-08-22
+                couponService.createCoupon(createCouponRequest.copy(startedAt = LocalDate.of(2024, 1, 9)), sellerId, shopId)
             }
 
             Then("에러가 발생한다."){
-                exception.message shouldBe "기간 설정이 잘못 되었습니다."
+                exception.message shouldBe "시작 날짜를 다시 확인해주세요."
             }
         }
     }
