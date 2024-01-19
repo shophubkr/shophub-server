@@ -24,5 +24,4 @@ interface CouponRepository : JpaRepository<Coupon, Long>, CouponRepositoryCustom
         WHERE NOW() > c.expiredAt
     """)
     fun updateCouponByExpiredAt()
-    fun findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId: Long, isTerminated: Boolean, pageable: Pageable): Page<Coupon>
 }

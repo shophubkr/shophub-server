@@ -24,9 +24,11 @@ class CouponServiceTest : BehaviorSpec({
 
     val couponRepository : CouponRepository = mockk()
     val shopRepository : ShopRepository = mockk()
-    val clock : Clock = Clock.fixed(Instant.parse("3333-08-22T10:00:00Z"), ZoneOffset.UTC)
+    val failClock : Clock = Clock.fixed(Instant.parse("3333-08-22T10:00:00Z"), ZoneOffset.UTC)
+    val successClock : Clock = Clock.fixed(Instant.parse("2024-01-15T10:00:00Z"), ZoneOffset.UTC)
 
-    val couponService = CouponService(couponRepository, shopRepository, clock)
+    val failCouponService = CouponService(couponRepository, shopRepository, failClock)
+    val successCouponService = CouponService(couponRepository, shopRepository, successClock)
 
     val createShopRequest = CreateShopRequest(
         name = "Test Shop",
@@ -61,7 +63,7 @@ class CouponServiceTest : BehaviorSpec({
         every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
 
         When("쿠폰을 생성할 때"){
-            val response = couponService.createCoupon(createCouponRequest, sellerId, shopId)
+            val response = successCouponService.createCoupon(createCouponRequest, sellerId, shopId)
 
             Then("쿠폰의 ID가 반환된다."){
                 response shouldBe CouponIdResponse(couponId)
@@ -71,7 +73,7 @@ class CouponServiceTest : BehaviorSpec({
         When("쿠폰 만료일자가 생성일자보다 더 빠르면"){
             val exception = shouldThrow<IllegalArgumentException> {
                 //startedAt = LocalDate.of(2024, 2, 10)
-                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2024, 1, 1)), sellerId, shopId)
+                failCouponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2024, 1, 1)), sellerId, shopId)
             }
             Then("에러가 발생한다."){
                 exception.message shouldBe "기간 설정이 잘못 되었습니다."
@@ -81,7 +83,7 @@ class CouponServiceTest : BehaviorSpec({
         When("오늘 일자보다 생성일자가 더 빠르면"){
             val exception = shouldThrow<IllegalArgumentException> {
                 //now = 3333-08-22
-                couponService.createCoupon(createCouponRequest.copy(startedAt = LocalDate.of(2024, 1, 9)), sellerId, shopId)
+                failCouponService.createCoupon(createCouponRequest.copy(startedAt = LocalDate.of(2024, 1, 9)), sellerId, shopId)
             }
 
             Then("에러가 발생한다."){
@@ -95,7 +97,7 @@ class CouponServiceTest : BehaviorSpec({
 
         When("쿠폰을 생성하려고 시도할 때") {
             val exception = shouldThrow<ResourceNotFoundException> {
-                couponService.createCoupon(createCouponRequest, sellerId, notShopId)
+                failCouponService.createCoupon(createCouponRequest, sellerId, notShopId)
             }
 
             Then("예외가 발생해야 한다") {
@@ -109,11 +111,11 @@ class CouponServiceTest : BehaviorSpec({
         val isFinished = false
         val expectedPage = PageImpl(listOf(coupon))
 
-        every { couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable) } returns expectedPage
+        every { couponRepository.findByExpiredAt(shopId, isFinished, pageable) } returns expectedPage
         every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
 
         When("쿠폰 리스트를 조회할 때"){
-            val resultPage = couponService.getCouponList(shopId, isFinished, pageable)
+            val resultPage = failCouponService.getCouponList(shopId, isFinished, pageable)
 
             Then("쿠폰 리스트 페이지가 반환된다."){
                 resultPage shouldBe expectedPage
@@ -125,7 +127,7 @@ class CouponServiceTest : BehaviorSpec({
         every { couponRepository.findByCouponIdAndDeletedIsFalse(couponId) } returns coupon
 
         When("terminateCoupon 메소드가 호출될 때") {
-            couponService.terminateCoupon(couponId, userId)
+            failCouponService.terminateCoupon(couponId, userId)
 
             Then("쿠폰은 종료 상태로 변경된다.") {
                 coupon.isTerminated shouldBe true
