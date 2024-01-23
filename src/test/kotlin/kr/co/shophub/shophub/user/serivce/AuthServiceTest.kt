@@ -39,7 +39,6 @@ class AuthServiceTest : BehaviorSpec({
         val request = JoinRequest(
             "test@test.com",
             "password",
-            "name",
             UserRole.USER_BUYER
         )
 

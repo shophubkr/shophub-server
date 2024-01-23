@@ -9,8 +9,6 @@ data class JoinRequest(
     val email: String,
     @NotBlank(message = "비밀번호가 일치하지 않습니다.")
     val password: String,
-    @NotBlank(message = "닉네임을 입력해주세요.")
-    val nickname: String,
     val role: UserRole,
 
     val phoneNumber: String = "",

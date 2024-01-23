@@ -6,6 +6,7 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
+import kr.co.shophub.shophub.user.util.NicknameGenerator
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -23,17 +24,27 @@ class AuthService(
     @Transactional
     fun join(request: JoinRequest): UserResponse {
         val telNum = checkTelNum(request)
+        checkEmail(request.email)
+        val randomNickname = makeRandomNickname()
         val user = User(
             email = request.email,
             password = request.password,
-            nickname = request.nickname,
+            nickname = randomNickname,
             userRole = request.role,
             phoneNumber = telNum,
         )
-        checkEmail(user.email)
-        checkNickname(user.nickname)
         user.encodePassword(passwordEncoder)
         return UserResponse.toResponse(userRepository.save(user))
+    }
+
+    private fun makeRandomNickname(): String {
+        try {
+            val randomNickname = NicknameGenerator.makeNickname()
+            checkNickname(randomNickname)
+            return randomNickname
+        } catch (e: IllegalStateException) {
+            return makeRandomNickname()
+        }
     }
 
     private fun checkTelNum(request: JoinRequest): String {
@@ -90,7 +101,7 @@ class AuthService(
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         checkEmail(socialJoinRequest.newEmail)
         oldEmailUser.updateSocialInfo(socialJoinRequest, socialJoinRequest.role)
-        return UserResponse(oldEmailUser.id)
+        return UserResponse(oldEmailUser.id, socialJoinRequest.nickname)
     }
 
     private fun checkEmail(email: String) {

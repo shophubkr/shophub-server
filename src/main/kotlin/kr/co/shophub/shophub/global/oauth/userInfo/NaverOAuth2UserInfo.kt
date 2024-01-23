@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.global.oauth.userInfo
 
+import kr.co.shophub.shophub.user.util.NicknameGenerator
+
 class NaverOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(attributes) {
     override fun getId(): String {
         val response = attributes["response"] as Map<*, *>
@@ -8,9 +10,7 @@ class NaverOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(
     }
 
     override fun getNickname(): String {
-        val response = attributes["response"] as Map<*, *>
-
-        return (response["name"] as String)
+        return NicknameGenerator.makeNickname()
     }
 
     override fun getEmail(): String {

@@ -82,7 +82,6 @@ class User(
         this.deleted = true
     }
 
-
     fun addBusiness(business: Business) {
         this.businessList.add(business)
         this.userRole = UserRole.SELLER
