@@ -25,11 +25,15 @@ class CouponService(
         createCouponRequest: CreateCouponRequest,
         userId: Long,
         shopId: Long,
+        nowDate: LocalDate,
     ): CouponIdResponse {
         val shop = findShop(shopId)
         isOwnerOfShop(shop, userId)
-
-        validateCreateCouponRequest(createCouponRequest.startedAt, createCouponRequest.expiredAt)
+        validateCreateCouponRequest(
+            createCouponRequest.startedAt,
+            createCouponRequest.expiredAt,
+            nowDate,
+        )
 
         val coupon = Coupon(createCouponRequest, shop)
         shop.coupons.add(coupon)
@@ -38,8 +42,9 @@ class CouponService(
         return CouponIdResponse(saveCoupon.id)
     }
 
-    private fun validateCreateCouponRequest(startedAt: LocalDate, expiredAt: LocalDate) {
+    private fun validateCreateCouponRequest(startedAt: LocalDate, expiredAt: LocalDate, nowDate: LocalDate) {
         require(startedAt.isBefore(expiredAt)) {"기간 설정이 잘못 되었습니다."}
+        require(startedAt.isAfter(nowDate).or(startedAt == nowDate)) {"시작 날짜를 다시 확인해주세요."}
     }
 
     private fun findShop(shopId: Long) = (shopRepository.findByIdAndDeletedIsFalse(shopId)
@@ -53,25 +58,27 @@ class CouponService(
 
     fun getCouponList(
         shopId: Long,
-        isFinished: Boolean,
-        pageable: Pageable
+        isTerminated: Boolean,
+        pageable: Pageable,
+        nowDate: LocalDate,
     ): Page<Coupon> {
         isNotShopExist(shopId)
-        return couponRepository.findAllByShopIdAndIsTerminatedAndDeletedIsFalse(shopId, isFinished, pageable)
+        return couponRepository.findByExpiredAt(shopId, isTerminated, nowDate, pageable)
     }
 
     @Transactional
     fun terminateCoupon(
         couponId: Long,
         userId: Long,
+        nowDate: LocalDate,
     ) {
         val coupon = findCoupon(couponId)
         isOwnerOfShop(coupon.shop, userId)
-        coupon.terminateCoupon()
+        coupon.terminateCoupon(nowDate)
     }
 
     private fun findCoupon(couponId: Long): Coupon {
-        return couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+        return couponRepository.findByCouponId(couponId)
             ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
     }
 

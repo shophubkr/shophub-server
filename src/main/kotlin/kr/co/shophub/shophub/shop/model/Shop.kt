@@ -51,11 +51,11 @@ class Shop(
     @OneToMany(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var tags: MutableList<ShopTag> = mutableListOf(),
 
+    @Column(name = "is_deleted")
+    private var deleted: Boolean = false,
+
     @OneToOne(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
     var business: Business? = null,
-
-    @Column(name = "is_deleted")
-    private var deleted: Boolean = false
 
 ) : BaseEntity() {
     constructor(createShopRequest: CreateShopRequest, sellerId: Long) : this(
