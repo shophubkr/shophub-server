@@ -10,7 +10,10 @@ import kr.co.shophub.shophub.user.dto.SocialJoinRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
-@Table(indexes = [Index(name = "email_password_idx", columnList = "email, password")])
+@Table(indexes = [
+    Index(name = "email_idx", columnList = "email"),
+    Index(name = "nickname_idx", columnList = "nickname"),
+])
 class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
