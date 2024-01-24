@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.shop.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.product.model.product.Product
@@ -51,7 +52,10 @@ class Shop(
     var tags: MutableList<ShopTag> = mutableListOf(),
 
     @Column(name = "is_deleted")
-    private var deleted: Boolean = false
+    private var deleted: Boolean = false,
+
+    @OneToOne(mappedBy = "shop", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var business: Business? = null,
 
 ) : BaseEntity() {
     constructor(createShopRequest: CreateShopRequest, sellerId: Long) : this(
@@ -108,4 +112,7 @@ class Shop(
         this.level = followCnt/10 + 1
     }
 
+    fun addBusiness(savedBusiness: Business) {
+        this.business = savedBusiness
+    }
 }
