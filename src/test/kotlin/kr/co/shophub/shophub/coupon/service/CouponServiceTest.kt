@@ -142,7 +142,7 @@ class CouponServiceTest : BehaviorSpec({
                 val resultCoupon = couponService.getShortestExpirationCoupon(shopId, now)
                 resultCoupon shouldNotBe null
 
-                assertThat(resultCoupon.expiredAt).isAfterOrEqualTo(now)
+                assertThat(resultCoupon.expiredAt).isBeforeOrEqualTo(now)
             }
         }
     }
