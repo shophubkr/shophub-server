@@ -42,7 +42,7 @@ class CouponRepositoryImpl(
                 shopIdEq(shopId),
                 isFinished(nowDate, isTerminate),
             )
-            .fetchOne() ?: throw ResourceNotFoundException("")
+            .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
 
 
         return PageImpl(contents, pageable, total)
@@ -57,7 +57,7 @@ class CouponRepositoryImpl(
                 )
             .orderBy(coupon.expiredAt.asc())
             .limit(1)
-            .fetchOne() ?: throw ResourceNotFoundException("")
+            .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
     }
 
     private fun goe(nowDate: LocalDate): BooleanExpression =
