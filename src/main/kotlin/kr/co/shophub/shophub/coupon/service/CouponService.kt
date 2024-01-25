@@ -2,8 +2,10 @@ package kr.co.shophub.shophub.coupon.service
 
 import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
 import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
+import kr.co.shophub.shophub.coupon.dto.ShortestExpirationCouponResponse
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
+import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
@@ -64,6 +66,14 @@ class CouponService(
     ): Page<Coupon> {
         isNotShopExist(shopId)
         return couponRepository.findByExpiredAt(shopId, isTerminated, nowDate, pageable)
+    }
+
+    fun getShortestExpirationCoupon(
+        shopId: Long,
+        nowDate: LocalDate,
+    ): Coupon {
+        isNotShopExist(shopId)
+        return couponRepository.findShortestExpirationCoupons(shopId, nowDate)
     }
 
     @Transactional

@@ -48,11 +48,26 @@ class CouponRepositoryImpl(
         return PageImpl(contents, pageable, total)
     }
 
+    override fun findShortestExpirationCoupons(shopId: Long, nowDate: LocalDate): Coupon {
+        return queryFactory
+            .selectFrom(coupon)
+            .where(
+                shopIdEq(shopId),
+                goe(nowDate),
+                )
+            .orderBy(coupon.expiredAt.asc())
+            .limit(1)
+            .fetchOne() ?: throw ResourceNotFoundException("")
+    }
+
+    private fun goe(nowDate: LocalDate): BooleanExpression =
+        coupon.expiredAt.goe(nowDate)
+
     private fun shopIdEq(shopId: Long): BooleanExpression =
         coupon.shop.id.eq(shopId)
 
     private fun isFinished(nowDate: LocalDate, isTerminate: Boolean): BooleanExpression {
-        return if (isTerminate) coupon.expiredAt.before(nowDate)
-        else coupon.expiredAt.after(nowDate).or(coupon.expiredAt.eq(nowDate))
+        return if (isTerminate) coupon.expiredAt.lt(nowDate)
+        else coupon.expiredAt.goe(nowDate)
     }
 }
