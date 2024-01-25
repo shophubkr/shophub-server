@@ -51,23 +51,24 @@ class CouponRepositoryImpl(
     override fun findShortestExpirationCoupons(shopId: Long, nowDate: LocalDate): Coupon {
         return queryFactory
             .selectFrom(coupon)
+            .join(coupon.shop, shop).fetchJoin()
             .where(
                 shopIdEq(shopId),
-                goe(nowDate),
+                expiredGoe(nowDate),
                 )
             .orderBy(coupon.expiredAt.asc())
             .limit(1)
             .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
     }
 
-    private fun goe(nowDate: LocalDate): BooleanExpression =
+    private fun isFinished(nowDate: LocalDate, isTerminate: Boolean): BooleanExpression {
+        return if (isTerminate) coupon.expiredAt.lt(nowDate)
+        else expiredGoe(nowDate)
+    }
+
+    private fun expiredGoe(nowDate: LocalDate): BooleanExpression =
         coupon.expiredAt.goe(nowDate)
 
     private fun shopIdEq(shopId: Long): BooleanExpression =
         coupon.shop.id.eq(shopId)
-
-    private fun isFinished(nowDate: LocalDate, isTerminate: Boolean): BooleanExpression {
-        return if (isTerminate) coupon.expiredAt.lt(nowDate)
-        else coupon.expiredAt.goe(nowDate)
-    }
 }
