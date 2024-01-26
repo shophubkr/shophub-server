@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.coupon.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
@@ -13,6 +14,7 @@ import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.CreateShopRequest
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import java.time.LocalDate
@@ -128,5 +130,22 @@ class CouponServiceTest : BehaviorSpec({
             }
         }
     }
+
+    Given("쿠폰과 가게가 주어졌을 때") {
+        every { couponRepository.findShortestExpirationCoupons(any(), now) } returns coupon
+        every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
+
+        When("getShortestExpirationCoupon가 호출 되면") {
+            couponService.getShortestExpirationCoupon(shopId, now)
+
+            Then("가장 유효기간이 짧은 쿠폰이 반환된다.") {
+                val resultCoupon = couponService.getShortestExpirationCoupon(shopId, now)
+                resultCoupon shouldNotBe null
+
+                assertThat(resultCoupon.expiredAt).isBeforeOrEqualTo(now)
+            }
+        }
+    }
+
 
 })

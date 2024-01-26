@@ -1,9 +1,6 @@
 package kr.co.shophub.shophub.coupon.controller
 
-import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
-import kr.co.shophub.shophub.coupon.dto.CouponListResponse
-import kr.co.shophub.shophub.coupon.dto.CouponResponse
-import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
+import kr.co.shophub.shophub.coupon.dto.*
 import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
@@ -55,7 +52,14 @@ class CouponController(
             result = CouponListResponse(couponList.content.map { CouponResponse(it, clock) }),
             page = PageInfo.of(page = couponList)
         )
+    }
 
+    @GetMapping("/shops/{shopId}/coupons/shortest")
+    fun getShortestExpirationCoupon(
+        @PathVariable shopId: Long,
+    ) :CommonResponse<ShortestExpirationCouponResponse>{
+        val coupon = couponService.getShortestExpirationCoupon(shopId, LocalDate.now(clock))
+        return CommonResponse(ShortestExpirationCouponResponse(coupon, clock))
     }
 
     @PatchMapping("/coupons/{couponId}")

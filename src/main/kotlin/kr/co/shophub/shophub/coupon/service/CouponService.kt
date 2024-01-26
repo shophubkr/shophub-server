@@ -66,6 +66,14 @@ class CouponService(
         return couponRepository.findByExpiredAt(shopId, isTerminated, nowDate, pageable)
     }
 
+    fun getShortestExpirationCoupon(
+        shopId: Long,
+        nowDate: LocalDate,
+    ): Coupon {
+        isNotShopExist(shopId)
+        return couponRepository.findShortestExpirationCoupons(shopId, nowDate)
+    }
+
     @Transactional
     fun terminateCoupon(
         couponId: Long,
