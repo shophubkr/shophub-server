@@ -1,9 +1,6 @@
 package kr.co.shophub.shophub.coupon.controller
 
-import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
-import kr.co.shophub.shophub.coupon.dto.CouponListResponse
-import kr.co.shophub.shophub.coupon.dto.CouponResponse
-import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
+import kr.co.shophub.shophub.coupon.dto.*
 import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
@@ -13,12 +10,15 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.time.Clock
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v1")
 class CouponController(
     private val couponService: CouponService,
     private val loginService: LoginService,
+    private val clock: Clock,
 ) {
 
     @PostMapping("/shops/{shopId}/coupons")
@@ -30,7 +30,8 @@ class CouponController(
         return couponService.createCoupon(
             createCouponRequest = createCouponRequest,
             userId = loginService.getLoginUserId(),
-            shopId = shopId
+            shopId = shopId,
+            nowDate = LocalDate.now(clock),
         ).let { CommonResponse(it) }
 
     }
@@ -39,19 +40,26 @@ class CouponController(
     fun getCouponList(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
         @PathVariable shopId: Long,
-        @RequestParam isFinished: Boolean = false,
+        @RequestParam isTerminated: Boolean = false,
     ): CommonResponse<CouponListResponse> {
-
         val couponList = couponService.getCouponList(
             shopId = shopId,
             pageable = pageable,
-            isFinished = isFinished,
+            isTerminated = isTerminated,
+            nowDate = LocalDate.now(clock),
         )
         return CommonResponse(
-            result = CouponListResponse(couponList.content.map { CouponResponse(it) }),
+            result = CouponListResponse(couponList.content.map { CouponResponse(it, clock) }),
             page = PageInfo.of(page = couponList)
         )
+    }
 
+    @GetMapping("/shops/{shopId}/coupons/shortest")
+    fun getShortestExpirationCoupon(
+        @PathVariable shopId: Long,
+    ) :CommonResponse<ShortestExpirationCouponResponse>{
+        val coupon = couponService.getShortestExpirationCoupon(shopId, LocalDate.now(clock))
+        return CommonResponse(ShortestExpirationCouponResponse(coupon, clock))
     }
 
     @PatchMapping("/coupons/{couponId}")
@@ -62,7 +70,8 @@ class CouponController(
         val userId = loginService.getLoginUserId()
         couponService.terminateCoupon(
             couponId = couponId,
-            userId = userId
+            userId = userId,
+            nowDate = LocalDate.now(clock),
         )
         return CommonResponse.EMPTY
 

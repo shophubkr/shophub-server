@@ -21,14 +21,15 @@ class UserCouponCustomRepositoryImpl (
     override fun findUserCoupons(
         userId: Long,
         status: UserCouponCond,
-        pageable: Pageable
+        pageable: Pageable,
+        nowDate: LocalDate,
     ): Page<UserCoupon> {
         val contents = queryFactory.selectFrom(userCoupon)
             .join(userCoupon.coupon, coupon).fetchJoin()
             .join(coupon.shop, shop).fetchJoin()
             .where(
                 userCoupon.user.id.eq(userId).and(
-                    couponSearchCond(status)
+                    couponSearchCond(status, nowDate)
                 )
             )
             .offset(pageable.offset)
@@ -39,11 +40,11 @@ class UserCouponCustomRepositoryImpl (
 
         return PageImpl(contents)
     }
-    private fun couponSearchCond(status: UserCouponCond): BooleanExpression =
+    private fun couponSearchCond(status: UserCouponCond, nowDate: LocalDate): BooleanExpression =
         when (status) {
             UserCouponCond.USED -> userCoupon.isUsed.isTrue
-            UserCouponCond.UNUSED -> userCoupon.isUsed.isFalse
-            UserCouponCond.EXPIRED -> coupon.expiredAt.before(LocalDate.now()).or(coupon.isTerminated.isTrue)
+            UserCouponCond.UNUSED -> userCoupon.isUsed.isFalse.and(coupon.expiredAt.before(nowDate).or(coupon.expiredAt.eq(nowDate)))
+            UserCouponCond.EXPIRED -> userCoupon.isUsed.isFalse.and(coupon.expiredAt.after(nowDate))
         }
 }
 
