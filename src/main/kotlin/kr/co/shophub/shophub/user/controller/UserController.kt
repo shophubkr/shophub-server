@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.time.Clock
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -18,6 +20,7 @@ class UserController(
     private val loginService: LoginService,
     private val userService: UserService,
     private val mailService: MailService,
+    private val clock: Clock
 ) {
 
     @GetMapping("/me")
@@ -32,7 +35,7 @@ class UserController(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
     ): CommonResponse<UserCouponListResponse>{
         val userId = getLoginId()
-        val myCoupons = userService.getMyCoupons(userId, status, pageable)
+        val myCoupons = userService.getMyCoupons(userId, status, pageable, LocalDate.now(clock))
         return CommonResponse(myCoupons)
     }
 

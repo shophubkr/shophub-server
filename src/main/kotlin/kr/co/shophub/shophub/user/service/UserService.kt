@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -41,9 +42,14 @@ class UserService(
         )
     }
 
-    fun getMyCoupons(userId: Long, status: UserCouponCond, pageable: Pageable): UserCouponListResponse{
+    fun getMyCoupons(
+        userId: Long,
+        status: UserCouponCond,
+        pageable: Pageable,
+        nowDate: LocalDate,
+        ): UserCouponListResponse{
         val userCoupons =
-            userCouponRepository.findUserCoupons(userId, status, pageable)
+            userCouponRepository.findUserCoupons(userId, status, pageable, nowDate)
                 .map { userCoupon -> UserCouponResponse(userCoupon) }
 
         return UserCouponListResponse(userCoupons, userCoupons.content.size)
@@ -90,7 +96,7 @@ class UserService(
     }
 
     private fun findCoupon(couponId: Long): Coupon {
-        return couponRepository.findByCouponIdAndDeletedIsFalse(couponId)
+        return couponRepository.findByCouponId(couponId)
             ?: throw ResourceNotFoundException("쿠폰 정보를 찾을 수 없습니다.")
     }
 
