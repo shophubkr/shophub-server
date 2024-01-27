@@ -30,6 +30,7 @@ class ShopService(
     @Transactional
     fun createShop(sellerId: Long, createShopRequest: CreateShopRequest): ShopIdResponse {
         validateShopRequest(createShopRequest.images.size, createShopRequest.tags.size)
+        validateBusinessNumber(createShopRequest.businessNumber)
 
         val shop = Shop(createShopRequest, sellerId)
         val savedShop = shopRepository.save(shop)
@@ -98,6 +99,10 @@ class ShopService(
     private fun validateShopRequest(imageSize: Int, tagSize: Int) {
         require(imageSize >= MIN_IMAGE_COUNT) { "이미지 최소 갯수는 $MIN_IMAGE_COUNT 개 입니다." }
         require(tagSize <= MAX_TAG_COUNT) { "태그 최대 갯수는 $MAX_TAG_COUNT 개 입니다." }
+    }
+
+    private fun validateBusinessNumber(businessNumber: String) {
+        require(!businessRepository.existsByBusinessNumber(businessNumber)) { "이미 존재하는 사업체 입니다." }
     }
 
     fun findShop(shopId: Long): Shop {
