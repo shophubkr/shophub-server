@@ -39,12 +39,11 @@ class ShopService(
         val seller = getUser(sellerId)
         val business = Business(
             businessNumber = createShopRequest.businessNumber,
-            seller = seller,
-            shop = savedShop,
+            sellerId = seller.id,
+            shopId = savedShop.id,
         )
-        val savedBusiness = businessRepository.save(business)
-        seller.addBusiness(savedBusiness)
-        savedShop.addBusiness(savedBusiness)
+        businessRepository.save(business)
+        seller.updateToSeller()
 
         return ShopIdResponse(savedShop.id)
     }

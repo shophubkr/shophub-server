@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.shop.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -65,8 +64,8 @@ class ShopServiceTest : BehaviorSpec({
 
     val business = Business(
         businessNumber = "bizNum",
-        seller = seller,
-        shop = shop,
+        sellerId = seller.id,
+        shopId = shop.id,
     )
 
     beforeTest {
@@ -87,13 +86,6 @@ class ShopServiceTest : BehaviorSpec({
 
             Then("ShopIdResponse를 반환해야 함") {
                 response shouldBe ShopIdResponse(shopId)
-            }
-
-            Then("올바른 비즈니스가 생성 된다.") {
-                seller.businessList.size shouldBe 1
-                seller.businessList[0].businessNumber shouldBe business.businessNumber
-                shop.business shouldNotBe null
-                shop.business?.businessNumber shouldBe business.businessNumber
             }
         }
 

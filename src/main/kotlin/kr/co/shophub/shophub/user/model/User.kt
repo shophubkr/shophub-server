@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.user.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
-import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.global.oauth.OAuthAttributes
 import kr.co.shophub.shophub.user.dto.SocialJoinRequest
@@ -45,9 +44,6 @@ class User(
     @Enumerated(EnumType.STRING)
     var providerType: ProviderType = ProviderType.NO_SOCIAL,
 
-    @OneToMany(mappedBy = "seller", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val businessList: MutableList<Business> = mutableListOf(),
-
     ): BaseEntity() {
     fun encodePassword(encoder: PasswordEncoder) {
         this.password = encoder.encode(password)
@@ -85,8 +81,7 @@ class User(
         this.deleted = true
     }
 
-    fun addBusiness(business: Business) {
-        this.businessList.add(business)
+    fun updateToSeller() {
         this.userRole = UserRole.SELLER
     }
     
