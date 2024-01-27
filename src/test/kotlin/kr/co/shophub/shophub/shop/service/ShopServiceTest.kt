@@ -81,6 +81,7 @@ class ShopServiceTest : BehaviorSpec({
             every { shopTagRepository.saveAll(any<List<ShopTag>>()) } returns listOf(mockk())
             every { userRepository.findByIdAndDeletedIsFalse(sellerId) } returns seller
             every { businessRepository.save(any()) } returns business
+            every { businessRepository.existsByBusinessNumber(any()) } returns false
 
             val response = shopService.createShop(sellerId, createShopRequest)
 
