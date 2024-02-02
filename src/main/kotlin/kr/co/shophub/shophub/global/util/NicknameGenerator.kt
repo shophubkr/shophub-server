@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.user.util
+package kr.co.shophub.shophub.global.util
 
 class NicknameGenerator {
 

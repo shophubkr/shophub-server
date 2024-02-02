@@ -4,7 +4,7 @@ import kr.co.shophub.shophub.global.oauth.userInfo.GoogleOAuth2UserInfo
 import kr.co.shophub.shophub.global.oauth.userInfo.NaverOAuth2UserInfo
 import kr.co.shophub.shophub.global.oauth.userInfo.NoSocialOAuth2USerInfo
 import kr.co.shophub.shophub.global.oauth.userInfo.OAuth2UserInfo
-import kr.co.shophub.shophub.global.oauth.util.PasswordUtil
+import kr.co.shophub.shophub.global.util.PasswordUtil
 import kr.co.shophub.shophub.user.model.ProviderType
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole

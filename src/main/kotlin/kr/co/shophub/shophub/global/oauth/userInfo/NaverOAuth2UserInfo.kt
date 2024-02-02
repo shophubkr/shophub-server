@@ -1,6 +1,6 @@
 package kr.co.shophub.shophub.global.oauth.userInfo
 
-import kr.co.shophub.shophub.user.util.NicknameGenerator
+import kr.co.shophub.shophub.global.util.NicknameGenerator
 
 class NaverOAuth2UserInfo(attributes: MutableMap<String, Any>) : OAuth2UserInfo(attributes) {
     override fun getId(): String {

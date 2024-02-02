@@ -6,7 +6,7 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserRepository
-import kr.co.shophub.shophub.user.util.NicknameGenerator
+import kr.co.shophub.shophub.global.util.NicknameGenerator
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
