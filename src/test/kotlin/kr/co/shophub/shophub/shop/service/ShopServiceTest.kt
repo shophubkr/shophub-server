@@ -105,6 +105,21 @@ class ShopServiceTest : BehaviorSpec({
                 exception.message shouldBe "이미지 최소 갯수는 3 개 입니다."
             }
         }
+
+        When("이미 존재 하는 사업체인 경우") {
+
+            every { businessRepository.existsByBusinessNumber(any()) } returns true
+
+            val exception = shouldThrow<IllegalArgumentException> {
+                shopService.createShop(sellerId, createShopRequest)
+                shopService.createShop(sellerId, createShopRequest)
+            }
+
+            Then("예외가 발생해야 함") {
+
+                exception.message shouldBe "이미 존재하는 사업체 입니다."
+            }
+        }
     }
 
     Given("getShop 메서드") {
