@@ -39,7 +39,6 @@ class AuthServiceTest : BehaviorSpec({
         val request = JoinRequest(
             "test@test.com",
             "password",
-            "name",
             UserRole.USER_BUYER
         )
 
@@ -76,21 +75,6 @@ class AuthServiceTest : BehaviorSpec({
                     authService.join(request)
                 }.message
                 message shouldBe "이미 가입한 이메일 입니다."
-            }
-        }
-
-        When("중복 닉네임 시도") {
-
-            every { userRepository.existsByEmail(any()) } returns false
-            every { userRepository.existsByNickname(any()) } returns true
-            every { userRepository.save(any()) } returns user
-            every { passwordEncoder.encode(request.password) } returns "encodedPassword"
-
-            Then("예외 발생") {
-                val message = shouldThrow<IllegalStateException> {
-                    authService.join(request)
-                }.message
-                message shouldBe "이미 가입한 닉네임 입니다."
             }
         }
     }

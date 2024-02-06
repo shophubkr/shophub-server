@@ -3,13 +3,16 @@ package kr.co.shophub.shophub.user.model
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
-import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.global.model.BaseEntity
 import kr.co.shophub.shophub.global.oauth.OAuthAttributes
 import kr.co.shophub.shophub.user.dto.SocialJoinRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
+@Table(indexes = [
+    Index(name = "email_idx", columnList = "email"),
+    Index(name = "nickname_idx", columnList = "nickname"),
+])
 class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -26,11 +29,8 @@ class User(
 
     private var refreshToken: String = "empty",
     var providerId: String = "only-social",
-    var profile: String = "only-social",
+    var profile: String = "https://shophub-image.s3.ap-northeast-2.amazonaws.com/defualt/avatar_woman.png",
     var phoneNumber: String = "",
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
-    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
@@ -41,8 +41,8 @@ class User(
     @Enumerated(EnumType.STRING)
     var providerType: ProviderType = ProviderType.NO_SOCIAL,
 
-    @OneToMany(mappedBy = "seller", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val businessList: MutableList<Business> = mutableListOf(),
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
 
     ): BaseEntity() {
     fun encodePassword(encoder: PasswordEncoder) {
@@ -81,14 +81,16 @@ class User(
         this.deleted = true
     }
 
-
-    fun addBusiness(business: Business) {
-        this.businessList.add(business)
+    fun updateToSeller() {
         this.userRole = UserRole.SELLER
     }
     
     fun addUserCoupon(saveUserCoupon: UserCoupon) {
         this.userCoupon.add(saveUserCoupon)
+    }
+
+    fun updateProfile(profile: String) {
+        this.profile = profile
     }
 
 }

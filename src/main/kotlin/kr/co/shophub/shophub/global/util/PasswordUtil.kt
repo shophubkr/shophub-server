@@ -1,4 +1,4 @@
-package kr.co.shophub.shophub.global.oauth.util
+package kr.co.shophub.shophub.global.util
 
 import java.util.*
 

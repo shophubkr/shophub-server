@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.shop.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -65,8 +64,8 @@ class ShopServiceTest : BehaviorSpec({
 
     val business = Business(
         businessNumber = "bizNum",
-        seller = seller,
-        shop = shop,
+        sellerId = seller.id,
+        shopId = shop.id,
     )
 
     beforeTest {
@@ -82,18 +81,12 @@ class ShopServiceTest : BehaviorSpec({
             every { shopTagRepository.saveAll(any<List<ShopTag>>()) } returns listOf(mockk())
             every { userRepository.findByIdAndDeletedIsFalse(sellerId) } returns seller
             every { businessRepository.save(any()) } returns business
+            every { businessRepository.existsByBusinessNumber(any()) } returns false
 
             val response = shopService.createShop(sellerId, createShopRequest)
 
             Then("ShopIdResponse를 반환해야 함") {
                 response shouldBe ShopIdResponse(shopId)
-            }
-
-            Then("올바른 비즈니스가 생성 된다.") {
-                seller.businessList.size shouldBe 1
-                seller.businessList[0].businessNumber shouldBe business.businessNumber
-                shop.business shouldNotBe null
-                shop.business?.businessNumber shouldBe business.businessNumber
             }
         }
 
@@ -110,6 +103,21 @@ class ShopServiceTest : BehaviorSpec({
             Then("예외가 발생해야 함") {
 
                 exception.message shouldBe "이미지 최소 갯수는 3 개 입니다."
+            }
+        }
+
+        When("이미 존재 하는 사업체인 경우") {
+
+            every { businessRepository.existsByBusinessNumber(any()) } returns true
+
+            val exception = shouldThrow<IllegalArgumentException> {
+                shopService.createShop(sellerId, createShopRequest)
+                shopService.createShop(sellerId, createShopRequest)
+            }
+
+            Then("예외가 발생해야 함") {
+
+                exception.message shouldBe "이미 존재하는 사업체 입니다."
             }
         }
     }
