@@ -64,6 +64,9 @@ class UserService(
         if (updateRequest.newPassword != null) {
             user.updatePassword(passwordEncoder, updateRequest.newPassword)
         }
+        if (updateRequest.profile != null) {
+            user.updateProfile(updateRequest.profile)
+        }
     }
 
     fun checkPassword(request: PasswordRequest, userId: Long) {

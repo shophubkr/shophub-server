@@ -49,7 +49,8 @@ class UserServiceTest: BehaviorSpec({
 
         val infoUpdateRequest = InfoUpdateRequest(
             nickname = "name",
-            newPassword = "newPassword"
+            newPassword = "newPassword",
+            profile = "newImage"
         )
 
         val passwordRequest = PasswordRequest(

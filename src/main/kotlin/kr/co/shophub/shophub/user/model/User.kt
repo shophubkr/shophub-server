@@ -29,11 +29,8 @@ class User(
 
     private var refreshToken: String = "empty",
     var providerId: String = "only-social",
-    var profile: String = "only-social",
+    var profile: String = "https://shophub-image.s3.ap-northeast-2.amazonaws.com/defualt/avatar_woman.png",
     var phoneNumber: String = "",
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
-    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
 
     @Column(name = "is_deleted")
     private var deleted: Boolean = false,
@@ -43,6 +40,9 @@ class User(
 
     @Enumerated(EnumType.STRING)
     var providerType: ProviderType = ProviderType.NO_SOCIAL,
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.ALL])
+    var userCoupon: MutableList<UserCoupon> = mutableListOf(),
 
     ): BaseEntity() {
     fun encodePassword(encoder: PasswordEncoder) {
@@ -87,6 +87,10 @@ class User(
     
     fun addUserCoupon(saveUserCoupon: UserCoupon) {
         this.userCoupon.add(saveUserCoupon)
+    }
+
+    fun updateProfile(profile: String) {
+        this.profile = profile
     }
 
 }
