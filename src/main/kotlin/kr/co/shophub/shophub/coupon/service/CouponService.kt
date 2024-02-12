@@ -36,7 +36,7 @@ class CouponService(
         )
 
         val coupon = Coupon(createCouponRequest, shop)
-        shop.coupons.add(coupon)
+        shop.addCoupon(coupon)
         val saveCoupon = couponRepository.save(coupon)
 
         return CouponIdResponse(saveCoupon.id)
@@ -93,5 +93,11 @@ class CouponService(
     private fun isOwnerOfShop(shop: Shop, loginUserId: Long) {
         check(shop.sellerId == loginUserId) { "매장에 대한 권한이 없습니다." }
     }
+
+    fun getMyCoupons(userId: Long): List<Coupon> {
+        return shopRepository.findAllBySellerId(userId)
+            .flatMap { it.coupons }
+    }
+
 
 }

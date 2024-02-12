@@ -3,6 +3,7 @@ package kr.co.shophub.shophub.shop.service
 import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.business.repository.BusinessRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
+import kr.co.shophub.shophub.product.dto.ProductResponse
 import kr.co.shophub.shophub.shop.dto.*
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.model.ShopImage
@@ -56,6 +57,17 @@ class ShopService(
 
     fun getShopList(pageable: Pageable): Page<Shop> {
         return shopRepository.findAllByDeletedIsFalse(pageable)
+    }
+
+    fun getMyShopList(userId: Long): List<MyShopResponse> {
+        return shopRepository.findAllBySellerId(userId)
+            .map { myShop ->
+                val products = myShop.products
+                    .sortedByDescending { it.id }
+                    .take(2)
+                    .map { ProductResponse(it) }
+                MyShopResponse(myShop.name, products)
+            }
     }
 
     @Transactional

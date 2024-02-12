@@ -10,6 +10,7 @@ import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.model.UserCoupon
 import kr.co.shophub.shophub.user.model.UserCouponCond
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
@@ -29,17 +30,29 @@ class UserService(
     private val passwordEncoder: PasswordEncoder,
 ) {
 
-    fun getMyPage(userId: Long): MyPageResponse {
+    fun getMyPage(userId: Long): BuyerPageResponse {
         val user = getUser(userId)
         val followShopIds = user.userCoupon.map { it.coupon.shop.id }
         val shops = followRepository.findByUser(user)
             .map { ShopSimpleResponse(it.shop, followShopIds) }
         val coupons = mutableListOf<String>()
-        return MyPageResponse(
-            email = user.email,
+        return BuyerPageResponse(
+            userInfo = UserInfo(user.email, user.profile),
             followShop = ShopListResponse(shops),
             coupon = coupons
         )
+    }
+
+    fun getUserEmail(userId: Long, userRole: UserRole): UserInfo {
+        val user = getUser(userId)
+        checkRole(user.userRole, userRole)
+        return UserInfo(user.email, user.profile)
+    }
+
+    private fun checkRole(userRole: UserRole, correctRole: UserRole) {
+        if (userRole != correctRole) {
+            throw IllegalArgumentException("올바른 유저 유형이 아닙니다.")
+        }
     }
 
     fun getMyCoupons(

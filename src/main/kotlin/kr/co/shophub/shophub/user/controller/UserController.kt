@@ -1,10 +1,15 @@
 package kr.co.shophub.shophub.user.controller
 
+import kr.co.shophub.shophub.coupon.dto.CouponListResponse
+import kr.co.shophub.shophub.coupon.dto.CouponResponse
+import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.login.service.LoginService
+import kr.co.shophub.shophub.shop.service.ShopService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.UserCouponCond
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.service.MailService
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.data.domain.Pageable
@@ -20,13 +25,26 @@ class UserController(
     private val loginService: LoginService,
     private val userService: UserService,
     private val mailService: MailService,
+    private val shopService: ShopService,
+    private val couponService: CouponService,
     private val clock: Clock
 ) {
 
-    @GetMapping("/me")
-    fun myInfo(): CommonResponse<MyPageResponse> {
+    @GetMapping("/me/buyer")
+    fun buyerInfo(): CommonResponse<BuyerPageResponse> {
         val userId = getLoginId()
         return CommonResponse(userService.getMyPage(userId))
+    }
+
+    @GetMapping("/me/seller")
+    fun sellerInfo(): CommonResponse<SellerPageResponse> {
+        val userId = getLoginId()
+        val myCoupons = couponService.getMyCoupons(userId)
+        return CommonResponse(SellerPageResponse(
+            userInfo = userService.getUserEmail(userId, UserRole.SELLER),
+            myShop = shopService.getMyShopList(userId),
+            myCoupon = CouponListResponse(myCoupons.map { CouponResponse(it, clock) })
+        ))
     }
 
     @GetMapping("/me/coupons")

@@ -107,4 +107,8 @@ class Shop(
         this.followCnt--
         this.level = followCnt/10 + 1
     }
+
+    fun addCoupon(coupon: Coupon) {
+        this.coupons.add(coupon)
+    }
 }
