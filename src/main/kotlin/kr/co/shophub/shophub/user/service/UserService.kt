@@ -43,7 +43,7 @@ class UserService(
         )
     }
 
-    fun getUserEmail(userId: Long, userRole: UserRole): UserInfo {
+    fun getUserInfo(userId: Long, userRole: UserRole): UserInfo {
         val user = getUser(userId)
         checkRole(user.userRole, userRole)
         return UserInfo(user.email, user.profile)

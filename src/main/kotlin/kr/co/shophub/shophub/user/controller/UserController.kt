@@ -41,7 +41,7 @@ class UserController(
         val userId = getLoginId()
         val myCoupons = couponService.getMyCoupons(userId)
         return CommonResponse(SellerPageResponse(
-            userInfo = userService.getUserEmail(userId, UserRole.SELLER),
+            userInfo = userService.getUserInfo(userId, UserRole.SELLER),
             myShop = shopService.getMyShopList(userId),
             myCoupon = CouponListResponse(myCoupons.map { CouponResponse(it, clock) })
         ))
