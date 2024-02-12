@@ -91,13 +91,24 @@ class UserServiceTest: BehaviorSpec({
         When("셀러 마이페이지 접근시") {
 
             every { userRepository.findByIdAndDeletedIsFalse(sellerId) } returns sellerUser
-            every { followRepository.findByUser(any()) } returns shopList
 
             val userInfo = userService.getUserInfo(buyerId, UserRole.SELLER)
 
             Then("정보를 내어 준다.") {
                 userInfo.email shouldBe buyerUser.email
                 userInfo.profile shouldBe buyerUser.profile
+            }
+        }
+
+        When("셀러가 아닌데 셀러 마이페이지 접근시") {
+
+            every { userRepository.findByIdAndDeletedIsFalse(buyerId) } returns buyerUser
+
+            Then("에러가 발생한다.") {
+                val message = shouldThrow<IllegalArgumentException> {
+                    userService.getUserInfo(buyerId, UserRole.SELLER)
+                }.message
+                message shouldBe "올바른 유저 유형이 아닙니다."
             }
         }
 

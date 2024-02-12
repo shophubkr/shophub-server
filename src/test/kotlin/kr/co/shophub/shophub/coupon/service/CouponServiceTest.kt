@@ -147,5 +147,20 @@ class CouponServiceTest : BehaviorSpec({
         }
     }
 
+    Given("셀러가 자신이 발급한 쿠폰을 확인하기 위해") {
+        every { couponRepository.save(any()) } returns coupon
+        every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
+        every { shopRepository.findAllBySellerId(sellerId) } returns listOf(shop)
+        When("getMyCoupons를 호출하면") {
+            couponService.createCoupon(createCouponRequest, sellerId, shopId, now)
+            couponService.createCoupon(createCouponRequest, sellerId, shopId, now)
+
+            val myCoupons = couponService.getMyCoupons(sellerId)
+            Given("쿠폰 리스트를 반환한다.") {
+                myCoupons.size shouldBe 2
+            }
+        }
+    }
+
 
 })
