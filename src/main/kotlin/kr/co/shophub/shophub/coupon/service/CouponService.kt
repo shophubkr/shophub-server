@@ -1,9 +1,7 @@
 package kr.co.shophub.shophub.coupon.service
 
 import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
-import kr.co.shophub.shophub.coupon.dto.CouponResponse
 import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
-import kr.co.shophub.shophub.coupon.dto.MyCouponResponse
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
@@ -13,7 +11,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Clock
 import java.time.LocalDate
 
 @Service
@@ -97,20 +94,9 @@ class CouponService(
         check(shop.sellerId == loginUserId) { "매장에 대한 권한이 없습니다." }
     }
 
-    fun getMyCoupons(userId: Long, clock: Clock): MyCouponResponse {
-        val couponList = shopRepository.findAllBySellerId(userId)
+    fun getMyCoupons(userId: Long): List<Coupon> {
+        return shopRepository.findAllBySellerId(userId)
             .flatMap { it.coupons }
-            .map { CouponResponse(it, clock) }
-
-        val totalSize = couponList.size
-        val finishCount = couponList.count { it.isFinished }
-
-        return MyCouponResponse(
-            couponList,
-            totalSize,
-            totalSize - finishCount,
-            finishCount
-        )
     }
 
 

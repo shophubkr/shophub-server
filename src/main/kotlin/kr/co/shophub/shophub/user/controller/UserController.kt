@@ -1,5 +1,7 @@
 package kr.co.shophub.shophub.user.controller
 
+import kr.co.shophub.shophub.coupon.dto.CouponResponse
+import kr.co.shophub.shophub.coupon.dto.MyCouponResponse
 import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
@@ -37,10 +39,19 @@ class UserController(
     @GetMapping("/me/seller")
     fun sellerInfo(): CommonResponse<SellerPageResponse> {
         val userId = getLoginId()
+        val myCoupons = couponService.getMyCoupons(userId).stream()
+            .map { CouponResponse(it, clock) }.toList()
+        val totalCouponSize = myCoupons.size
+        val finishedCount = myCoupons.filter { it.isFinished }.size
         return CommonResponse(SellerPageResponse(
             userInfo = userService.getUserInfo(userId, UserRole.SELLER),
             myShop = shopService.getMyShopList(userId),
-            myCoupon = couponService.getMyCoupons(userId, clock)
+            myCoupon = MyCouponResponse(
+                myCoupons,
+                totalCouponSize,
+                totalCouponSize - finishedCount,
+                finishedCount
+            )
         ))
     }
 
