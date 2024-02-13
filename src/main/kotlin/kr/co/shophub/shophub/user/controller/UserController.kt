@@ -1,7 +1,5 @@
 package kr.co.shophub.shophub.user.controller
 
-import kr.co.shophub.shophub.coupon.dto.CouponResponse
-import kr.co.shophub.shophub.coupon.dto.MyCouponResponse
 import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
@@ -16,8 +14,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.time.Clock
-import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -27,7 +23,6 @@ class UserController(
     private val mailService: MailService,
     private val shopService: ShopService,
     private val couponService: CouponService,
-    private val clock: Clock
 ) {
 
     @GetMapping("/me/buyer")
@@ -39,19 +34,10 @@ class UserController(
     @GetMapping("/me/seller")
     fun sellerInfo(): CommonResponse<SellerPageResponse> {
         val userId = getLoginId()
-        val myCoupons = couponService.getMyCoupons(userId).stream()
-            .map { CouponResponse(it, clock) }.toList()
-        val totalCouponSize = myCoupons.size
-        val finishedCount = myCoupons.filter { it.isFinished }.size
         return CommonResponse(SellerPageResponse(
             userInfo = userService.getUserInfo(userId, UserRole.SELLER),
             myShop = shopService.getMyShopList(userId),
-            myCoupon = MyCouponResponse(
-                myCoupons,
-                totalCouponSize,
-                totalCouponSize - finishedCount,
-                finishedCount
-            )
+            myCoupon = couponService.getMyCoupons(userId)
         ))
     }
 
@@ -61,7 +47,7 @@ class UserController(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
     ): CommonResponse<UserCouponListResponse>{
         val userId = getLoginId()
-        val myCoupons = userService.getMyCoupons(userId, status, pageable, LocalDate.now(clock))
+        val myCoupons = userService.getMyCoupons(userId, status, pageable)
         return CommonResponse(myCoupons)
     }
 

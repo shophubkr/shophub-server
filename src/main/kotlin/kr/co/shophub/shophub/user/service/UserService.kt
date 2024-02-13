@@ -4,6 +4,8 @@ import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
+import kr.co.shophub.shophub.global.time.OnServiceTime
+import kr.co.shophub.shophub.global.time.Time
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.user.dto.*
@@ -17,7 +19,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -28,6 +29,7 @@ class UserService(
     private val couponRepository: CouponRepository,
     private val followRepository: FollowRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val onServiceTime: Time,
 ) {
 
     fun getMyPage(userId: Long): BuyerPageResponse {
@@ -62,10 +64,9 @@ class UserService(
         userId: Long,
         status: UserCouponCond,
         pageable: Pageable,
-        nowDate: LocalDate,
         ): UserCouponListResponse{
         val userCoupons =
-            userCouponRepository.findUserCoupons(userId, status, pageable, nowDate)
+            userCouponRepository.findUserCoupons(userId, status, pageable, onServiceTime.now())
                 .map { userCoupon -> UserCouponResponse(userCoupon) }
 
         return UserCouponListResponse(userCoupons, userCoupons.content.size)

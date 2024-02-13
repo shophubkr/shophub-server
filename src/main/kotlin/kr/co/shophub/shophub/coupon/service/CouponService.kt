@@ -1,10 +1,10 @@
 package kr.co.shophub.shophub.coupon.service
 
-import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
-import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
+import kr.co.shophub.shophub.coupon.dto.*
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
+import kr.co.shophub.shophub.global.time.Time
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
@@ -18,6 +18,7 @@ import java.time.LocalDate
 class CouponService(
     private val couponRepository: CouponRepository,
     private val shopRepository: ShopRepository,
+    private val onServiceTime: Time,
 ) {
 
     @Transactional
@@ -25,14 +26,13 @@ class CouponService(
         createCouponRequest: CreateCouponRequest,
         userId: Long,
         shopId: Long,
-        nowDate: LocalDate,
     ): CouponIdResponse {
         val shop = findShop(shopId)
         isOwnerOfShop(shop, userId)
         validateCreateCouponRequest(
             createCouponRequest.startedAt,
             createCouponRequest.expiredAt,
-            nowDate,
+            onServiceTime.now(),
         )
 
         val coupon = Coupon(createCouponRequest, shop)
@@ -60,29 +60,28 @@ class CouponService(
         shopId: Long,
         isTerminated: Boolean,
         pageable: Pageable,
-        nowDate: LocalDate,
-    ): Page<Coupon> {
+    ): Page<CouponResponse> {
         isNotShopExist(shopId)
-        return couponRepository.findByExpiredAt(shopId, isTerminated, nowDate, pageable)
+        return couponRepository.findByExpiredAt(shopId, isTerminated, onServiceTime.now(), pageable)
+            .map { CouponResponse(it, onServiceTime.now()) }
     }
 
     fun getShortestExpirationCoupon(
         shopId: Long,
-        nowDate: LocalDate,
-    ): Coupon {
+    ): ShortestExpirationCouponResponse {
         isNotShopExist(shopId)
-        return couponRepository.findShortestExpirationCoupons(shopId, nowDate)
+        val coupon = couponRepository.findShortestExpirationCoupons(shopId, onServiceTime.now())
+        return ShortestExpirationCouponResponse(coupon, onServiceTime.now())
     }
 
     @Transactional
     fun terminateCoupon(
         couponId: Long,
         userId: Long,
-        nowDate: LocalDate,
     ) {
         val coupon = findCoupon(couponId)
         isOwnerOfShop(coupon.shop, userId)
-        coupon.terminateCoupon(nowDate)
+        coupon.terminateCoupon(onServiceTime.now())
     }
 
     private fun findCoupon(couponId: Long): Coupon {
@@ -94,9 +93,20 @@ class CouponService(
         check(shop.sellerId == loginUserId) { "매장에 대한 권한이 없습니다." }
     }
 
-    fun getMyCoupons(userId: Long): List<Coupon> {
-        return shopRepository.findAllBySellerId(userId)
+    fun getMyCoupons(userId: Long): MyCouponResponse {
+        val couponResponses = shopRepository.findAllBySellerId(userId)
             .flatMap { it.coupons }
+            .map { CouponResponse(it, onServiceTime.now()) }
+
+        val totalSize = couponResponses.size
+        val finishedSize = couponResponses.filter { it.isFinished }.size
+
+        return MyCouponResponse(
+            couponResponses,
+            totalSize,
+            totalSize - finishedSize,
+            finishedSize
+        )
     }
 
 

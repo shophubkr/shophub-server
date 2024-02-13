@@ -17,6 +17,7 @@ import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
+import kr.co.shophub.shophub.util.FakeTime
 import org.springframework.security.crypto.password.PasswordEncoder
 
 class UserServiceTest: BehaviorSpec({
@@ -31,7 +32,8 @@ class UserServiceTest: BehaviorSpec({
         userCouponRepository = userCouponRepository,
         couponRepository = couponRepository,
         followRepository = followRepository,
-        passwordEncoder = passwordEncoder
+        passwordEncoder = passwordEncoder,
+        FakeTime()
     )
 
     Given("로그인 상태에서") {

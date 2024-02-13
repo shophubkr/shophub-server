@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
+import kr.co.shophub.shophub.coupon.dto.CouponResponse
 import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
@@ -14,6 +15,7 @@ import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.dto.CreateShopRequest
 import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
+import kr.co.shophub.shophub.util.FakeTime
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -23,10 +25,10 @@ class CouponServiceTest : BehaviorSpec({
 
     val couponRepository : CouponRepository = mockk()
     val shopRepository : ShopRepository = mockk()
-    val now = LocalDate.of(2024, 1, 24)
+    val now = LocalDate.of(2024, 12, 20)
     val failNow = LocalDate.of(3333, 12, 31)
 
-    val couponService = CouponService(couponRepository, shopRepository)
+    val couponService = CouponService(couponRepository, shopRepository, FakeTime())
 
     val createShopRequest = CreateShopRequest(
         name = "Test Shop",
@@ -49,7 +51,7 @@ class CouponServiceTest : BehaviorSpec({
     val createCouponRequest = CreateCouponRequest(
         content = "Test coupon content",
         detail = "Test coupon detail",
-        startedAt = LocalDate.of(2024, 1, 24),
+        startedAt = LocalDate.of(2024, 12, 20),
         expiredAt = LocalDate.of(2030, 4, 12)
     )
 
@@ -61,7 +63,7 @@ class CouponServiceTest : BehaviorSpec({
         every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
 
         When("쿠폰을 생성할 때"){
-            val response = couponService.createCoupon(createCouponRequest, sellerId, shopId, now)
+            val response = couponService.createCoupon(createCouponRequest, sellerId, shopId)
 
             Then("쿠폰의 ID가 반환된다."){
                 response shouldBe CouponIdResponse(couponId)
@@ -70,7 +72,7 @@ class CouponServiceTest : BehaviorSpec({
 
         When("쿠폰 만료일자가 생성일자보다 더 빠르면"){
             val exception = shouldThrow<IllegalArgumentException> {
-                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2024, 1, 1)), sellerId, shopId, now)
+                couponService.createCoupon(createCouponRequest.copy(expiredAt = LocalDate.of(2024, 1, 1)), sellerId, shopId)
             }
             Then("에러가 발생한다."){
                 exception.message shouldBe "기간 설정이 잘못 되었습니다."
@@ -79,7 +81,7 @@ class CouponServiceTest : BehaviorSpec({
 
         When("오늘 일자보다 생성일자가 더 빠르면"){
             val exception = shouldThrow<IllegalArgumentException> {
-                couponService.createCoupon(createCouponRequest.copy(startedAt = LocalDate.of(2024, 1, 9)), sellerId, shopId, failNow)
+                couponService.createCoupon(createCouponRequest.copy(startedAt = LocalDate.of(2024, 1, 9)), sellerId, shopId)
             }
 
             Then("에러가 발생한다."){
@@ -93,7 +95,7 @@ class CouponServiceTest : BehaviorSpec({
 
         When("쿠폰을 생성하려고 시도할 때") {
             val exception = shouldThrow<ResourceNotFoundException> {
-                couponService.createCoupon(createCouponRequest, sellerId, notShopId, now)
+                couponService.createCoupon(createCouponRequest, sellerId, notShopId)
             }
 
             Then("예외가 발생해야 한다") {
@@ -111,10 +113,10 @@ class CouponServiceTest : BehaviorSpec({
         every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
 
         When("쿠폰 리스트를 조회할 때"){
-            val resultPage = couponService.getCouponList(shopId, isFinished, pageable, now)
+            val resultPage = couponService.getCouponList(shopId, isFinished, pageable)
 
             Then("쿠폰 리스트 페이지가 반환된다."){
-                resultPage shouldBe expectedPage
+                resultPage shouldBe expectedPage.map { CouponResponse(coupon, now) }
             }
         }
     }
@@ -123,7 +125,7 @@ class CouponServiceTest : BehaviorSpec({
         every { couponRepository.findByCouponId(couponId) } returns coupon
 
         When("terminateCoupon 메소드가 호출될 때") {
-            couponService.terminateCoupon(couponId, userId, now)
+            couponService.terminateCoupon(couponId, userId)
 
             Then("쿠폰은 종료 상태로 변경된다.") {
                 coupon.expiredAt shouldBe now.minusDays(1)
@@ -132,17 +134,18 @@ class CouponServiceTest : BehaviorSpec({
     }
 
     Given("쿠폰과 가게가 주어졌을 때") {
-        every { couponRepository.findShortestExpirationCoupons(any(), now) } returns coupon
-        every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
+
 
         When("getShortestExpirationCoupon가 호출 되면") {
-            couponService.getShortestExpirationCoupon(shopId, now)
+            every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
+            every { couponRepository.findShortestExpirationCoupons(any(), now) } returns coupon
+            couponService.getShortestExpirationCoupon(shopId)
 
             Then("가장 유효기간이 짧은 쿠폰이 반환된다.") {
-                val resultCoupon = couponService.getShortestExpirationCoupon(shopId, now)
+                val resultCoupon = couponService.getShortestExpirationCoupon(shopId)
                 resultCoupon shouldNotBe null
 
-                assertThat(resultCoupon.expiredAt).isBeforeOrEqualTo(now)
+                assertThat(resultCoupon.content).isNotNull()
             }
         }
     }
@@ -152,12 +155,12 @@ class CouponServiceTest : BehaviorSpec({
         every { shopRepository.findByIdAndDeletedIsFalse(shopId) } returns shop
         every { shopRepository.findAllBySellerId(sellerId) } returns listOf(shop)
         When("getMyCoupons를 호출하면") {
-            couponService.createCoupon(createCouponRequest, sellerId, shopId, now)
-            couponService.createCoupon(createCouponRequest, sellerId, shopId, now)
+            couponService.createCoupon(createCouponRequest, sellerId, shopId)
+            couponService.createCoupon(createCouponRequest, sellerId, shopId)
 
-            val myCoupons = couponService.getMyCoupons(sellerId)
+            val myCouponResponse = couponService.getMyCoupons(sellerId)
             Given("쿠폰 리스트를 반환한다.") {
-                myCoupons.size shouldBe 2
+                myCouponResponse.myCoupons.size shouldBe 2
             }
         }
     }

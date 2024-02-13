@@ -10,15 +10,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.time.Clock
-import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v1")
 class CouponController(
     private val couponService: CouponService,
     private val loginService: LoginService,
-    private val clock: Clock,
 ) {
 
     @PostMapping("/shops/{shopId}/coupons")
@@ -31,7 +28,6 @@ class CouponController(
             createCouponRequest = createCouponRequest,
             userId = loginService.getLoginUserId(),
             shopId = shopId,
-            nowDate = LocalDate.now(clock),
         ).let { CommonResponse(it) }
 
     }
@@ -46,10 +42,9 @@ class CouponController(
             shopId = shopId,
             pageable = pageable,
             isTerminated = isTerminated,
-            nowDate = LocalDate.now(clock),
         )
         return CommonResponse(
-            result = CouponListResponse(couponList.content.map { CouponResponse(it, clock) }),
+            result = CouponListResponse(couponList.content),
             page = PageInfo.of(page = couponList)
         )
     }
@@ -58,8 +53,7 @@ class CouponController(
     fun getShortestExpirationCoupon(
         @PathVariable shopId: Long,
     ) :CommonResponse<ShortestExpirationCouponResponse>{
-        val coupon = couponService.getShortestExpirationCoupon(shopId, LocalDate.now(clock))
-        return CommonResponse(ShortestExpirationCouponResponse(coupon, clock))
+        return CommonResponse(couponService.getShortestExpirationCoupon(shopId))
     }
 
     @PatchMapping("/coupons/{couponId}")
@@ -71,7 +65,6 @@ class CouponController(
         couponService.terminateCoupon(
             couponId = couponId,
             userId = userId,
-            nowDate = LocalDate.now(clock),
         )
         return CommonResponse.EMPTY
 
