@@ -28,7 +28,11 @@ class UserController(
     @GetMapping("/me/buyer")
     fun buyerInfo(): CommonResponse<BuyerPageResponse> {
         val userId = getLoginId()
-        return CommonResponse(userService.getMyPage(userId))
+        return CommonResponse(BuyerPageResponse(
+            userInfo = userService.getUserInfo(userId, UserRole.SELLER),
+            followShop = userService.getFollowShop(userId),
+            coupon = userService.getCouponCount(userId)
+        ))
     }
 
     @GetMapping("/me/seller")

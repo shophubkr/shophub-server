@@ -26,7 +26,6 @@ class CouponServiceTest : BehaviorSpec({
     val couponRepository : CouponRepository = mockk()
     val shopRepository : ShopRepository = mockk()
     val now = LocalDate.of(2024, 12, 20)
-    val failNow = LocalDate.of(3333, 12, 31)
 
     val couponService = CouponService(couponRepository, shopRepository, FakeTime())
 

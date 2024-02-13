@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.user.serivce
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
@@ -80,13 +79,11 @@ class UserServiceTest: BehaviorSpec({
             every { userRepository.findByIdAndDeletedIsFalse(buyerId) } returns buyerUser
             every { followRepository.findByUser(any()) } returns shopList
 
-            val myPageResponse = userService.getMyPage(buyerId)
+            val myPageResponse = userService.getUserInfo(buyerId, UserRole.USER_BUYER)
 
             Then("정보를 내어 준다.") {
-                myPageResponse.userInfo.email shouldBe buyerUser.email
-                myPageResponse.userInfo.profile shouldBe buyerUser.profile
-                myPageResponse.followShop shouldNotBe null
-                myPageResponse.coupon shouldNotBe null
+                myPageResponse.email shouldBe buyerUser.email
+                myPageResponse.profile shouldBe buyerUser.profile
             }
         }
 

@@ -1,10 +1,11 @@
 package kr.co.shophub.shophub.user.service
 
+import kr.co.shophub.shophub.coupon.dto.CouponResponse
+import kr.co.shophub.shophub.coupon.dto.MyCouponResponse
 import kr.co.shophub.shophub.coupon.model.Coupon
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
 import kr.co.shophub.shophub.follow.repository.FollowRepository
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
-import kr.co.shophub.shophub.global.time.OnServiceTime
 import kr.co.shophub.shophub.global.time.Time
 import kr.co.shophub.shophub.shop.dto.ShopListResponse
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
@@ -32,17 +33,12 @@ class UserService(
     private val onServiceTime: Time,
 ) {
 
-    fun getMyPage(userId: Long): BuyerPageResponse {
+    fun getFollowShop(userId: Long): ShopListResponse {
         val user = getUser(userId)
         val followShopIds = user.userCoupon.map { it.coupon.shop.id }
         val shops = followRepository.findByUser(user)
             .map { ShopSimpleResponse(it.shop, followShopIds) }
-        val coupons = mutableListOf<String>()
-        return BuyerPageResponse(
-            userInfo = UserInfo(user.email, user.profile),
-            followShop = ShopListResponse(shops),
-            coupon = coupons
-        )
+        return ShopListResponse(shops)
     }
 
     fun getUserInfo(userId: Long, userRole: UserRole): UserInfo {
@@ -70,6 +66,23 @@ class UserService(
                 .map { userCoupon -> UserCouponResponse(userCoupon) }
 
         return UserCouponListResponse(userCoupons, userCoupons.content.size)
+    }
+
+    fun getCouponCount(
+        userId: Long
+    ): MyCouponResponse {
+        val findAllByUser = userCouponRepository.findAllByUser(getUser(userId))
+            .map { CouponResponse(it.coupon, onServiceTime.now()) }
+
+        val totalSize = findAllByUser.size
+        val finishedSize = findAllByUser.filter { it.isFinished }.size
+
+        return MyCouponResponse(
+            findAllByUser,
+            totalSize,
+            totalSize - finishedSize,
+            finishedSize
+        )
     }
 
     @Transactional
