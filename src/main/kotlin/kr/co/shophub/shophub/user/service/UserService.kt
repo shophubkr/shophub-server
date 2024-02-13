@@ -50,6 +50,9 @@ class UserService(
     }
 
     private fun checkRole(userRole: UserRole, correctRole: UserRole) {
+        if (userRole == UserRole.USER_SELLER) {
+            throw IllegalArgumentException("가게 등록이 필요한 셀러입니다.")
+        }
         if (userRole != correctRole) {
             throw IllegalArgumentException("올바른 유저 유형이 아닙니다.")
         }
