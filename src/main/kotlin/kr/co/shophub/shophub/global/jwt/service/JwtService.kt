@@ -55,7 +55,7 @@ class JwtService(
         val user = userRepository.findByEmail(email)
             ?: throw ResourceNotFoundException("유저를 찾을 수 없습니다.")
         user.updateRefreshToken(refreshToken)
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, user.userRole)
     }
 
     private fun createAccessToken(email: String): String {
