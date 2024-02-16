@@ -93,7 +93,8 @@ class AuthServiceTest : BehaviorSpec({
 
         val tokenResponse = TokenResponse(
             accessToken = "accessToken",
-            refreshToken = "refreshToken"
+            refreshToken = "refreshToken",
+            userRole = UserRole.USER_BUYER
         )
 
         When("정상 로그인 시도") {
@@ -136,7 +137,8 @@ class AuthServiceTest : BehaviorSpec({
 
         val tokenResponse = TokenResponse(
             accessToken = "accessToken",
-            refreshToken = "refreshToken"
+            refreshToken = "refreshToken",
+            UserRole.USER_BUYER
         )
 
         When("토큰이 유효할 때") {

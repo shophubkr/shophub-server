@@ -1,18 +1,19 @@
 package kr.co.shophub.shophub.user.controller
 
+import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.login.service.LoginService
+import kr.co.shophub.shophub.shop.service.ShopService
 import kr.co.shophub.shophub.user.dto.*
 import kr.co.shophub.shophub.user.model.UserCouponCond
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.service.MailService
 import kr.co.shophub.shophub.user.service.UserService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.time.Clock
-import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -20,13 +21,28 @@ class UserController(
     private val loginService: LoginService,
     private val userService: UserService,
     private val mailService: MailService,
-    private val clock: Clock
+    private val shopService: ShopService,
+    private val couponService: CouponService,
 ) {
 
-    @GetMapping("/me")
-    fun myInfo(): CommonResponse<MyPageResponse> {
+    @GetMapping("/me/buyer")
+    fun buyerInfo(): CommonResponse<BuyerPageResponse> {
         val userId = getLoginId()
-        return CommonResponse(userService.getMyPage(userId))
+        return CommonResponse(BuyerPageResponse(
+            userInfo = userService.getUserInfo(userId, UserRole.SELLER),
+            followShop = userService.getFollowShop(userId),
+            coupon = userService.getCouponCount(userId)
+        ))
+    }
+
+    @GetMapping("/me/seller")
+    fun sellerInfo(): CommonResponse<SellerPageResponse> {
+        val userId = getLoginId()
+        return CommonResponse(SellerPageResponse(
+            userInfo = userService.getUserInfo(userId, UserRole.SELLER),
+            myShop = shopService.getMyShopList(userId),
+            myCoupon = couponService.getMyCoupons(userId)
+        ))
     }
 
     @GetMapping("/me/coupons")
@@ -35,7 +51,7 @@ class UserController(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
     ): CommonResponse<UserCouponListResponse>{
         val userId = getLoginId()
-        val myCoupons = userService.getMyCoupons(userId, status, pageable, LocalDate.now(clock))
+        val myCoupons = userService.getMyCoupons(userId, status, pageable)
         return CommonResponse(myCoupons)
     }
 

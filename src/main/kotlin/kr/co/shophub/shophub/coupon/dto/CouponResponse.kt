@@ -1,7 +1,6 @@
 package kr.co.shophub.shophub.coupon.dto
 
 import kr.co.shophub.shophub.coupon.model.Coupon
-import java.time.Clock
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -14,13 +13,13 @@ data class CouponResponse (
     val expiredAt: LocalDate,
     val dDay: Long,
 ){
-    constructor(coupon: Coupon, clock: Clock): this(
+    constructor(coupon: Coupon, now: LocalDate): this(
         id = coupon.id,
         content = coupon.content,
         detail = coupon.detail,
-        isFinished = LocalDate.now(clock).isAfter(coupon.expiredAt),
+        isFinished = now.isAfter(coupon.expiredAt),
         startedAt = coupon.startedAt,
         expiredAt = coupon.expiredAt,
-        dDay = ChronoUnit.DAYS.between(LocalDate.now(clock), coupon.expiredAt)
+        dDay = ChronoUnit.DAYS.between(now, coupon.expiredAt)
     )
 }

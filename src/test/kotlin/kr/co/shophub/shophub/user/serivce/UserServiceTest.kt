@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.user.serivce
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.co.shophub.shophub.coupon.repository.CouponRepository
@@ -13,9 +12,11 @@ import kr.co.shophub.shophub.user.dto.InfoUpdateRequest
 import kr.co.shophub.shophub.user.dto.PasswordRequest
 import kr.co.shophub.shophub.user.dto.PasswordUpdateRequest
 import kr.co.shophub.shophub.user.model.User
+import kr.co.shophub.shophub.user.model.UserRole
 import kr.co.shophub.shophub.user.repository.UserCouponRepository
 import kr.co.shophub.shophub.user.repository.UserRepository
 import kr.co.shophub.shophub.user.service.UserService
+import kr.co.shophub.shophub.util.FakeTime
 import org.springframework.security.crypto.password.PasswordEncoder
 
 class UserServiceTest: BehaviorSpec({
@@ -30,19 +31,30 @@ class UserServiceTest: BehaviorSpec({
         userCouponRepository = userCouponRepository,
         couponRepository = couponRepository,
         followRepository = followRepository,
-        passwordEncoder = passwordEncoder
+        passwordEncoder = passwordEncoder,
+        FakeTime()
     )
 
     Given("로그인 상태에서") {
 
-        val userId = 1L
+        val buyerId = 1L
+        val sellerId = 1L
 
-        val user = User(
-            id = userId,
+        val buyerUser = User(
+            id = buyerId,
             email = "test@test.com",
             password = "password",
             nickname = "name",
             phoneNumber = "telNum",
+        )
+
+        val sellerUser = User(
+            sellerId,
+            email = "test@test.com",
+            password = "password",
+            nickname = "name",
+            phoneNumber = "telNum",
+            userRole = UserRole.SELLER
         )
 
         val shopList = mutableListOf<Follow>()
@@ -64,28 +76,51 @@ class UserServiceTest: BehaviorSpec({
 
         When("마이페이지 접근시") {
 
-            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
+            every { userRepository.findByIdAndDeletedIsFalse(buyerId) } returns buyerUser
             every { followRepository.findByUser(any()) } returns shopList
 
-            val myPageResponse = userService.getMyPage(userId)
+            val myPageResponse = userService.getUserInfo(buyerId, UserRole.USER_BUYER)
 
             Then("정보를 내어 준다.") {
-                myPageResponse.email shouldBe user.email
-                myPageResponse.followShop shouldNotBe null
-                myPageResponse.coupon shouldNotBe null
+                myPageResponse.email shouldBe buyerUser.email
+                myPageResponse.profile shouldBe buyerUser.profile
+            }
+        }
+
+        When("셀러 마이페이지 접근시") {
+
+            every { userRepository.findByIdAndDeletedIsFalse(sellerId) } returns sellerUser
+
+            val userInfo = userService.getUserInfo(buyerId, UserRole.SELLER)
+
+            Then("정보를 내어 준다.") {
+                userInfo.email shouldBe buyerUser.email
+                userInfo.profile shouldBe buyerUser.profile
+            }
+        }
+
+        When("셀러가 아닌데 셀러 마이페이지 접근시") {
+
+            every { userRepository.findByIdAndDeletedIsFalse(buyerId) } returns buyerUser
+
+            Then("에러가 발생한다.") {
+                val message = shouldThrow<IllegalArgumentException> {
+                    userService.getUserInfo(buyerId, UserRole.SELLER)
+                }.message
+                message shouldBe "올바른 유저 유형이 아닙니다."
             }
         }
 
         When("정보 수정 요청시") {
 
-            every { userRepository.findByIdAndDeletedIsFalse(userId) } returns user
+            every { userRepository.findByIdAndDeletedIsFalse(buyerId) } returns buyerUser
             every { passwordEncoder.encode(any()) } returns "newPassword"
 
-            userService.updateInfo(userId, infoUpdateRequest)
+            userService.updateInfo(buyerId, infoUpdateRequest)
 
             Then("업데이트 반영 ") {
-                user.nickname shouldBe infoUpdateRequest.nickname
-                user.password shouldBe infoUpdateRequest.newPassword
+                buyerUser.nickname shouldBe infoUpdateRequest.nickname
+                buyerUser.password shouldBe infoUpdateRequest.newPassword
             }
         }
 
@@ -95,7 +130,7 @@ class UserServiceTest: BehaviorSpec({
 
             Then("비밀번호 확인 성공") {
                 val message = shouldThrow<IllegalArgumentException> {
-                    userService.checkPassword(passwordRequest, userId)
+                    userService.checkPassword(passwordRequest, buyerId)
                 }.message
 
                 message shouldBe "비밀 번호가 일치하지 않습니다."
@@ -104,13 +139,13 @@ class UserServiceTest: BehaviorSpec({
 
         When("비밀번호 변경 요청시") {
 
-            every { userRepository.findByEmail(passwordUpdateRequest.email) } returns user
+            every { userRepository.findByEmail(passwordUpdateRequest.email) } returns buyerUser
             every { passwordEncoder.encode(any()) } returns "newPassword"
 
             userService.updatePassword(passwordUpdateRequest)
 
             Then("비밀번호 변경 성공") {
-                user.password shouldBe passwordUpdateRequest.newPassword
+                buyerUser.password shouldBe passwordUpdateRequest.newPassword
             }
         }
     }
