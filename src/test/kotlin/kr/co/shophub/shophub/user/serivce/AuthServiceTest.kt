@@ -50,16 +50,25 @@ class AuthServiceTest : BehaviorSpec({
             phoneNumber = "telNum",
         )
 
+        val tokenResponse = TokenResponse(
+            accessToken = "accessToken",
+            refreshToken = "refreshToken",
+            UserRole.USER_BUYER
+        )
+
         When("정상 회원 가입 시도") {
 
             every { userRepository.existsByEmail(any()) } returns false
             every { userRepository.existsByNickname(any()) } returns false
             every { userRepository.save(any()) } returns user
             every { passwordEncoder.encode(request.password) } returns "encodedPassword"
+            every { jwtService.makeTokenResponse(any()) } returns tokenResponse
 
             Then("회원 가입 성공") {
                 val response = authService.join(request)
-                response.id shouldNotBe null
+                response.accessToken shouldNotBe null
+                response.refreshToken shouldNotBe null
+                response.userRole shouldBe  UserRole.USER_BUYER
             }
         }
 

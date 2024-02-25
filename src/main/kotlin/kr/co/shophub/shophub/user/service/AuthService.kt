@@ -22,7 +22,7 @@ class AuthService(
 ) {
 
     @Transactional
-    fun join(request: JoinRequest): UserResponse {
+    fun join(request: JoinRequest): TokenResponse {
         val telNum = checkTelNum(request)
         checkEmail(request.email)
         val randomNickname = makeRandomNickname()
@@ -34,7 +34,8 @@ class AuthService(
             phoneNumber = telNum,
         )
         user.encodePassword(passwordEncoder)
-        return UserResponse.toResponse(userRepository.save(user))
+        val savedUser = userRepository.save(user)
+        return jwtService.makeTokenResponse(savedUser.email)
     }
 
     private fun makeRandomNickname(): String {
