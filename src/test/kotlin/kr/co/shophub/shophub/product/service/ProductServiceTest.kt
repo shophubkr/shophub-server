@@ -52,7 +52,14 @@ class ProductServiceTest : BehaviorSpec({
     val shopId = 1L
     val notShopId = 4L
     val sellerId = 1L
-    val shop = Shop(createShopRequest, sellerId).apply { id = shopId }
+    val latitude = 0.0
+    val longitude = 0.0
+    val shop = Shop(
+        createShopRequest,
+        latitude,
+        longitude,
+        sellerId
+    ).apply { id = shopId }
 
     val createProductRequest = CreateProductRequest(
         name = "Sample Product",

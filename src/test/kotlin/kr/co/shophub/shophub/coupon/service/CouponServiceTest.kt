@@ -45,7 +45,12 @@ class CouponServiceTest : BehaviorSpec({
     val notShopId = 2L
     val sellerId = 1L
     val userId = 1L
-    val shop = Shop(createShopRequest, sellerId).apply { id = shopId }
+    val shop = Shop(
+        createShopRequest = createShopRequest,
+        latitude = 0.0,
+        longitude = 0.0,
+        sellerId = sellerId
+    ).apply { id = shopId }
 
     val createCouponRequest = CreateCouponRequest(
         content = "Test coupon content",

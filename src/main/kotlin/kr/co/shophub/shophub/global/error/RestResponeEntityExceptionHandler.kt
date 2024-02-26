@@ -1,5 +1,6 @@
 package kr.co.shophub.shophub.global.error
 
+import feign.FeignException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kr.co.shophub.shophub.global.dto.CustomProblemDetail
 import org.springframework.http.*
@@ -132,6 +133,26 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any>? {
         val statusCode = HttpStatus.CONFLICT
+        val body = CustomProblemDetail.forStatusAndDetail(statusCode, ex.message ?: statusCode.reasonPhrase)
+
+        return handleExceptionInternal(
+            ex = ex,
+            body = body,
+            headers = HttpHeaders(),
+            statusCode = statusCode,
+            request = request
+        )
+    }
+
+    /**
+     * feign client 에서 발생한 Exception 은 400 Internal Server Error 로 처리한다.
+     */
+    @ExceptionHandler(FeignException::class)
+    fun handleFeignException(
+        ex: FeignException,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        val statusCode = HttpStatus.BAD_REQUEST
         val body = CustomProblemDetail.forStatusAndDetail(statusCode, ex.message ?: statusCode.reasonPhrase)
 
         return handleExceptionInternal(
