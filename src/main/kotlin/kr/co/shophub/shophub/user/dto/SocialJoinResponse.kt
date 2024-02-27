@@ -4,6 +4,6 @@ data class SocialJoinResponse (
     val email: String = "",
     val password: String,
     val nickname: String,
-    val telNum: String = "",
+    val phoneNumber: String = "",
     val bizNumber: String = "",
 )

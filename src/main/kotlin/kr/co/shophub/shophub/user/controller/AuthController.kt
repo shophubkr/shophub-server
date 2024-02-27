@@ -18,7 +18,7 @@ class AuthController(
     }
 
     @PostMapping("/join")
-    fun join(@RequestBody joinRequest: JoinRequest): CommonResponse<UserResponse> {
+    fun join(@RequestBody joinRequest: JoinRequest): CommonResponse<TokenResponse> {
         return CommonResponse(authService.join(joinRequest))
     }
 
