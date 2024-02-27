@@ -18,7 +18,7 @@ data class ShopSimpleResponse(
         address = shop.address,
         introduce = shop.introduce,
         minPrice = shop.products.minByOrNull { it.price }?.price ?: 0,
-        checkCoupon = true
+        checkCoupon = shop.coupons.isNotEmpty()
     )
 
     constructor(shop: Shop, ids: List<Long>) : this(
