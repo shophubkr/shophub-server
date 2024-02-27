@@ -7,8 +7,8 @@ import kr.co.shophub.shophub.coupon.model.QCoupon.coupon
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.shop.model.QShop.shop
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.support.PageableExecutionUtils
 import java.time.LocalDate
 
 class CouponRepositoryImpl(
@@ -37,15 +37,14 @@ class CouponRepositoryImpl(
         val total = queryFactory
             .select(coupon.count())
             .from(coupon)
-            .leftJoin(coupon.shop, shop)
             .where(
                 shopIdEq(shopId),
                 isFinished(nowDate, isTerminate),
             )
-            .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
 
-
-        return PageImpl(contents, pageable, total)
+        return PageableExecutionUtils.getPage(contents, pageable) {
+            total.fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
+        }
     }
 
     override fun findShortestExpirationCoupons(shopId: Long, nowDate: LocalDate): Coupon {
