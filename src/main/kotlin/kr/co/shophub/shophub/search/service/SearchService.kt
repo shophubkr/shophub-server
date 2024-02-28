@@ -15,7 +15,7 @@ class SearchService(
     private val shopTagRepository: ShopTagRepository,
 ) {
 
-    fun searchAllShopWithShopTanAndProductTag(
+    fun searchAllShopWithShopTagAndProductTag(
         search: String,
         hasCoupon: Boolean?,
         sortBy: SortBy?,

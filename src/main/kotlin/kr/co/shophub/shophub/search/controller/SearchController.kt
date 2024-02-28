@@ -24,7 +24,7 @@ class SearchController(
         @RequestParam(required = false) sortBy: String?,
         pageable: Pageable
     ): CommonResponse<ShopListResponse> {
-        val searchList = searchService.searchAllShopWithShopTanAndProductTag(
+        val searchList = searchService.searchAllShopWithShopTagAndProductTag(
             search = search,
             hasCoupon = hasCoupon,
             sortBy = sortBy?.let { SortBy.valueOf(it) },
