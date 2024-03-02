@@ -30,6 +30,12 @@ repositories {
 
 val queryDslVersion = "5.0.0"
 
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:2022.0.3")
+	}
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -63,6 +69,9 @@ dependencies {
 
 	// mail
 	implementation ("org.springframework.boot:spring-boot-starter-mail")
+
+	//feign Client
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 }
 
 tasks.withType<KotlinCompile> {

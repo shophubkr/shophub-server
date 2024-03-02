@@ -35,6 +35,8 @@ class FollowServiceTest : BehaviorSpec({
         val shop = Shop(
             id = 2L,
             name = "name",
+            latitude = 0.0,
+            longitude = 0.0,
             address = "juso",
             telNum = "000",
             introduce = "introduce",
@@ -46,6 +48,8 @@ class FollowServiceTest : BehaviorSpec({
         val followedShop = Shop(
             id = 2L,
             name = "name",
+            latitude = 0.0,
+            longitude = 0.0,
             address = "juso",
             telNum = "000",
             introduce = "introduce",

@@ -2,6 +2,8 @@ package kr.co.shophub.shophub.shop.service
 
 import kr.co.shophub.shophub.business.model.Business
 import kr.co.shophub.shophub.business.repository.BusinessRepository
+import kr.co.shophub.shophub.geo.client.KakaoLocalClient
+import kr.co.shophub.shophub.geo.dto.KakaoAddressDocument
 import kr.co.shophub.shophub.global.error.ResourceNotFoundException
 import kr.co.shophub.shophub.product.dto.ProductResponse
 import kr.co.shophub.shophub.shop.dto.*
@@ -13,6 +15,7 @@ import kr.co.shophub.shophub.shop.repository.ShopRepository
 import kr.co.shophub.shophub.shop.repository.ShopTagRepository
 import kr.co.shophub.shophub.user.model.User
 import kr.co.shophub.shophub.user.repository.UserRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -26,6 +29,9 @@ class ShopService(
     private val shopTagRepository: ShopTagRepository,
     private val userRepository: UserRepository,
     private val businessRepository: BusinessRepository,
+    private val kakaoLocalClient: KakaoLocalClient,
+
+    @Value("\${kakao.restApiKey}") private val restApiKey: String,
 ) {
 
     @Transactional
@@ -33,7 +39,8 @@ class ShopService(
         validateShopRequest(createShopRequest.images.size, createShopRequest.tags.size)
         validateBusinessNumber(createShopRequest.businessNumber)
 
-        val shop = Shop(createShopRequest, sellerId)
+        val location = fetchLocation(createShopRequest.address)
+        val shop = Shop(createShopRequest, location.x.toDouble(), location.y.toDouble(), sellerId)
         val savedShop = shopRepository.save(shop)
         replaceShopImages(savedShop, createShopRequest.images)
         replaceShopTags(savedShop, createShopRequest.tags)
@@ -77,7 +84,8 @@ class ShopService(
         val shop = findShop(shopId)
         check(shop.sellerId == sellerId) { "변경 권한이 없습니다." }
 
-        shop.changeShop(changeShopRequest)
+        val location = fetchLocation(changeShopRequest.address)
+        shop.changeShop(changeShopRequest, location.x.toDouble(), location.y.toDouble())
         replaceShopImages(shop, changeShopRequest.images)
         replaceShopTags(shop, changeShopRequest.tags)
         return ShopIdResponse(shop.id)
@@ -88,6 +96,13 @@ class ShopService(
         val shop = findShop(shopId)
         check(shop.sellerId == sellerId) { "삭제 권한이 없습니다." }
         shop.softDelete()
+    }
+
+    fun fetchLocation(address: String): KakaoAddressDocument {
+        return kakaoLocalClient.searchAddress(
+            authorization = "KakaoAK $restApiKey",
+            query = address,
+        ).documents[0]
     }
 
     fun checkShopName(name: String): Boolean {

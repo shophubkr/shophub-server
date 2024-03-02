@@ -22,6 +22,12 @@ class Shop(
     var address: String,
 
     @field:NotNull
+    var latitude: Double,
+
+    @field:NotNull
+    var longitude: Double,
+
+    @field:NotNull
     var telNum: String,
 
     @field:NotNull
@@ -54,9 +60,16 @@ class Shop(
     private var deleted: Boolean = false
 
 ) : BaseEntity() {
-    constructor(createShopRequest: CreateShopRequest, sellerId: Long) : this(
+    constructor(
+        createShopRequest: CreateShopRequest,
+        latitude: Double,
+        longitude: Double,
+        sellerId: Long
+    ) : this(
         name = createShopRequest.name,
         address = createShopRequest.address,
+        latitude = latitude,
+        longitude = longitude,
         telNum = createShopRequest.telNum,
         introduce = createShopRequest.introduce,
         hour = createShopRequest.hour,
@@ -65,9 +78,15 @@ class Shop(
         sellerId = sellerId
     )
 
-    fun changeShop(changeShopRequest: ChangeShopRequest) {
+    fun changeShop(
+        changeShopRequest: ChangeShopRequest,
+        changeLatitude: Double,
+        changeLongitude: Double
+    ) {
         name = changeShopRequest.name
         address = changeShopRequest.address
+        latitude = changeLatitude
+        longitude = changeLongitude
         telNum = changeShopRequest.telNum
         introduce = changeShopRequest.introduce
         hour = changeShopRequest.hour
