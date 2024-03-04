@@ -18,7 +18,6 @@ class CouponRepositoryImpl(
     override fun findByExpiredAt(
         shopId: Long,
         isTerminate: Boolean,
-        nowDate: LocalDate,
         pageable: Pageable
     ): Page<Coupon> {
 
@@ -27,7 +26,7 @@ class CouponRepositoryImpl(
             .join(coupon.shop, shop).fetchJoin()
             .where(
                 shopIdEq(shopId),
-                isFinished(nowDate, isTerminate),
+                isFinished(isTerminate),
             )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
@@ -40,7 +39,7 @@ class CouponRepositoryImpl(
             .leftJoin(coupon.shop, shop)
             .where(
                 shopIdEq(shopId),
-                isFinished(nowDate, isTerminate),
+                isFinished(isTerminate),
             )
             .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
 
@@ -61,9 +60,8 @@ class CouponRepositoryImpl(
             .fetchOne() ?: throw ResourceNotFoundException("쿠폰이 존재하지 않습니다.")
     }
 
-    private fun isFinished(nowDate: LocalDate, isTerminate: Boolean): BooleanExpression {
-        return if (isTerminate) coupon.expiredAt.lt(nowDate)
-        else expiredGoe(nowDate)
+    private fun isFinished(isTerminate: Boolean): BooleanExpression {
+        return coupon.isTerminated.eq(isTerminate)
     }
 
     private fun expiredGoe(nowDate: LocalDate): BooleanExpression =

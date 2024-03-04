@@ -9,7 +9,9 @@ import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
@@ -20,6 +22,12 @@ class CouponService(
     private val shopRepository: ShopRepository,
     private val onServiceTime: Time,
 ) {
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional()
+    fun scheduled() {
+        couponRepository.updateCouponByExpiredAt()
+    }
 
     @Transactional
     fun createCoupon(
@@ -62,7 +70,7 @@ class CouponService(
         pageable: Pageable,
     ): Page<CouponResponse> {
         isNotShopExist(shopId)
-        return couponRepository.findByExpiredAt(shopId, isTerminated, onServiceTime.now(), pageable)
+        return couponRepository.findByExpiredAt(shopId, isTerminated, pageable)
             .map { CouponResponse(it, onServiceTime.now()) }
     }
 
@@ -81,7 +89,7 @@ class CouponService(
     ) {
         val coupon = findCoupon(couponId)
         isOwnerOfShop(coupon.shop, userId)
-        coupon.terminateCoupon(onServiceTime.now())
+        coupon.terminateCoupon()
     }
 
     private fun findCoupon(couponId: Long): Coupon {

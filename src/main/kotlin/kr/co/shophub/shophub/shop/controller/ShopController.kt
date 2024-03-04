@@ -5,6 +5,7 @@ import kr.co.shophub.shophub.global.dto.EmptyDto
 import kr.co.shophub.shophub.global.dto.PageInfo
 import kr.co.shophub.shophub.global.login.service.LoginService
 import kr.co.shophub.shophub.shop.dto.*
+import kr.co.shophub.shophub.shop.model.Shop
 import kr.co.shophub.shophub.shop.service.ShopService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -48,10 +49,9 @@ class ShopController(
 
         val shopList = shopService.getShopList(pageable)
         return CommonResponse(
-            result = ShopListResponse(shopList = shopList.content.map { ShopSimpleResponse(it) }),
+            result = ShopListResponse(shopList = shopList.content.map { ShopSimpleResponse(it, it.hasTerminateCoupon()) }),
             page = PageInfo.of(page = shopList)
         )
-
     }
 
     @PutMapping("/{shopId}")
