@@ -23,8 +23,8 @@ class CouponService(
 ) {
 
     @Scheduled(cron = "0 0 0 * * *")
-    @Transactional()
-    fun scheduled() {
+    @Transactional
+    fun updateTerminateCouponByScheduler() {
         couponRepository.updateCouponByExpiredAt()
     }
 

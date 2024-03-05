@@ -19,7 +19,7 @@ interface CouponRepository : JpaRepository<Coupon, Long>, CouponRepositoryCustom
     @Query("""
         UPDATE Coupon c 
         SET c.isTerminated = true
-        WHERE NOW() > c.expiredAt
+        WHERE NOW() > c.expiredAt AND c.isTerminated = false
     """)
     fun updateCouponByExpiredAt()
 }

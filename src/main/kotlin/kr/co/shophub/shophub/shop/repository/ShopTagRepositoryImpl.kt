@@ -2,9 +2,11 @@ package kr.co.shophub.shophub.shop.repository
 
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
+import kr.co.shophub.shophub.coupon.model.QCoupon
 import kr.co.shophub.shophub.product.model.product.QProduct.*
 import kr.co.shophub.shophub.product.model.tag.QProductTag.*
 import kr.co.shophub.shophub.search.model.SortBy
+import kr.co.shophub.shophub.shop.model.QShop
 import kr.co.shophub.shophub.shop.model.QShop.*
 import kr.co.shophub.shophub.shop.model.QShopTag.*
 import kr.co.shophub.shophub.shop.model.Shop
@@ -47,6 +49,10 @@ class ShopTagRepositoryImpl(
             query.orderBy(shop.id.desc())
         }
 
+        if (hasCoupon == true) {
+            query.where(hasCouponCondition(queryFactory, shop))
+        }
+
         val results = query
             .orderBy(shop.id.desc())
             .offset(pageable.offset)
@@ -64,5 +70,13 @@ class ShopTagRepositoryImpl(
 
     private fun containsSearchProductTag(search: String?): BooleanExpression? {
         return search?.takeIf { it.isNotBlank() }?.let { productTag.tag.contains(it) }
+    }
+
+    private fun hasCouponCondition(queryFactory: JPAQueryFactory, shopIdPath: QShop): BooleanExpression {
+        val qCoupon = QCoupon.coupon
+        return queryFactory.selectOne()
+            .from(qCoupon)
+            .where(qCoupon.shop.id.eq(shopIdPath.id).and(qCoupon.isTerminated.eq(false)))
+            .exists()
     }
 }
