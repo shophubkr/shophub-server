@@ -3,12 +3,11 @@ package kr.co.shophub.shophub.shop.repository
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import kr.co.shophub.shophub.coupon.model.QCoupon
-import kr.co.shophub.shophub.product.model.product.QProduct.*
-import kr.co.shophub.shophub.product.model.tag.QProductTag.*
+import kr.co.shophub.shophub.product.model.product.QProduct.product
+import kr.co.shophub.shophub.product.model.tag.QProductTag.productTag
 import kr.co.shophub.shophub.search.model.SortBy
-import kr.co.shophub.shophub.shop.model.QShop
-import kr.co.shophub.shophub.shop.model.QShop.*
-import kr.co.shophub.shophub.shop.model.QShopTag.*
+import kr.co.shophub.shophub.shop.model.QShop.shop
+import kr.co.shophub.shophub.shop.model.QShopTag.shopTag
 import kr.co.shophub.shophub.shop.model.Shop
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -49,8 +48,18 @@ class ShopTagRepositoryImpl(
             query.orderBy(shop.id.desc())
         }
 
-        if (hasCoupon == true) {
-            query.where(hasCouponCondition(queryFactory, shop))
+        if (hasCoupon != null) {
+            val qCoupon = QCoupon.coupon
+            val couponExists = queryFactory.selectOne()
+                .from(qCoupon)
+                .where(
+                    qCoupon.shop.id.eq(shop.id),
+                    qCoupon.isTerminated.eq(false)
+                )
+            query.where(
+                if (hasCoupon) couponExists.exists()
+                else couponExists.notExists()
+            )
         }
 
         val results = query
@@ -70,13 +79,5 @@ class ShopTagRepositoryImpl(
 
     private fun containsSearchProductTag(search: String?): BooleanExpression? {
         return search?.takeIf { it.isNotBlank() }?.let { productTag.tag.contains(it) }
-    }
-
-    private fun hasCouponCondition(queryFactory: JPAQueryFactory, shopIdPath: QShop): BooleanExpression {
-        val qCoupon = QCoupon.coupon
-        return queryFactory.selectOne()
-            .from(qCoupon)
-            .where(qCoupon.shop.id.eq(shopIdPath.id).and(qCoupon.isTerminated.eq(false)))
-            .exists()
     }
 }
