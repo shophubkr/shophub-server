@@ -13,7 +13,7 @@ data class ShopSimpleResponse(
     val minPrice: Int,
     val checkCoupon: Boolean,
 ) {
-    constructor(shop: Shop) : this(
+    constructor(shop: Shop, checkCoupon: Boolean) : this(
         id = shop.id,
         image = shop.images[0].imgUrl,
         name = shop.name,
@@ -22,7 +22,7 @@ data class ShopSimpleResponse(
         address = shop.address,
         introduce = shop.introduce,
         minPrice = shop.products.minByOrNull { it.price }?.price ?: 0,
-        checkCoupon = true
+        checkCoupon =  checkCoupon
     )
 
     constructor(shop: Shop, ids: List<Long>) : this(

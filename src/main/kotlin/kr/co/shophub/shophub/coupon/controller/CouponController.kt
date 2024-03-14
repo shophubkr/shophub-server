@@ -1,6 +1,9 @@
 package kr.co.shophub.shophub.coupon.controller
 
-import kr.co.shophub.shophub.coupon.dto.*
+import kr.co.shophub.shophub.coupon.dto.CouponIdResponse
+import kr.co.shophub.shophub.coupon.dto.CouponListResponse
+import kr.co.shophub.shophub.coupon.dto.CreateCouponRequest
+import kr.co.shophub.shophub.coupon.dto.ShortestExpirationCouponResponse
 import kr.co.shophub.shophub.coupon.service.CouponService
 import kr.co.shophub.shophub.global.dto.CommonResponse
 import kr.co.shophub.shophub.global.dto.EmptyDto

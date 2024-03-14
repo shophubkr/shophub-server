@@ -48,10 +48,9 @@ class ShopController(
 
         val shopList = shopService.getShopList(pageable)
         return CommonResponse(
-            result = ShopListResponse(shopList = shopList.content.map { ShopSimpleResponse(it) }),
+            result = ShopListResponse(shopList = shopList.content.map { ShopSimpleResponse(it, it.hasTerminateCoupon()) }),
             page = PageInfo.of(page = shopList)
         )
-
     }
 
     @PutMapping("/{shopId}")

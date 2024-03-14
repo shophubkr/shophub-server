@@ -23,12 +23,13 @@ class Coupon(
     val startedAt: LocalDate,
 
     @field:NotNull
-    var expiredAt: LocalDate,
+    val expiredAt: LocalDate,
+
+    var isTerminated: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     var shop: Shop,
-
     ): BaseEntity() {
 
     constructor(createCouponRequest: CreateCouponRequest, shop: Shop): this(
@@ -39,7 +40,7 @@ class Coupon(
         shop = shop,
     )
 
-    fun terminateCoupon(now: LocalDate) {
-        expiredAt = now.minusDays(1)
+    fun terminateCoupon() {
+        this.isTerminated = true
     }
 }

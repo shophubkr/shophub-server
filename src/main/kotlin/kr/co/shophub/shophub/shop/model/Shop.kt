@@ -93,6 +93,10 @@ class Shop(
         hourDescription = changeShopRequest.hourDescription
     }
 
+    fun hasTerminateCoupon(): Boolean {
+        return this.coupons.any { !it.isTerminated }
+    }
+
     fun addShopImages(image: List<ShopImage>) {
         images.addAll(image)
     }

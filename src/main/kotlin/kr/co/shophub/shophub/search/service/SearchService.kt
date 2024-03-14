@@ -3,7 +3,6 @@ package kr.co.shophub.shophub.search.service
 import kr.co.shophub.shophub.search.model.SortBy
 import kr.co.shophub.shophub.shop.dto.ShopSimpleResponse
 import kr.co.shophub.shophub.shop.repository.ShopTagRepository
-import kr.co.shophub.shophub.user.model.QUserCoupon
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -27,6 +26,8 @@ class SearchService(
            sortBy = sortBy,
            pageable = pageable
        )
-           .map { ShopSimpleResponse(it) }
+           .map {
+               ShopSimpleResponse(it, it.hasTerminateCoupon())
+           }
     }
 }

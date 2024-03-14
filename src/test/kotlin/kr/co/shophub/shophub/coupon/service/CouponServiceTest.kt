@@ -113,7 +113,7 @@ class CouponServiceTest : BehaviorSpec({
         val isFinished = false
         val expectedPage = PageImpl(listOf(coupon))
 
-        every { couponRepository.findByExpiredAt(shopId, isFinished, now, pageable) } returns expectedPage
+        every { couponRepository.findByExpiredAt(shopId, isFinished, pageable) } returns expectedPage
         every { shopRepository.existsByIdAndDeletedIsFalse(shopId) } returns true
 
         When("쿠폰 리스트를 조회할 때"){
@@ -132,7 +132,7 @@ class CouponServiceTest : BehaviorSpec({
             couponService.terminateCoupon(couponId, userId)
 
             Then("쿠폰은 종료 상태로 변경된다.") {
-                coupon.expiredAt shouldBe now.minusDays(1)
+                coupon.isTerminated shouldBe true
             }
         }
     }
